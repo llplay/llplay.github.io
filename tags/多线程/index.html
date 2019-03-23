@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+<title>Tag: 多线程 - duoduo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+    
+    <meta property="og:type" content="website">
+<meta property="og:title" content="duoduo">
+<meta property="og:url" content="http://llplay.github.io/tags/多线程/index.html">
+<meta property="og:site_name" content="duoduo">
+<meta property="og:locale" content="en">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="duoduo">
+
+
+
+
+
+
+
+<link rel="icon" href="/images/favicon.svg">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css">
+
+
+    
+    
+    
+    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+    
+
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+    
+
+    
+    
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+
+    
+    
+    
+    
+
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+    
+    
+    
+
+    
+    
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-3-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                <img src="/images/logo.svg" alt="duoduo" height="28">
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item" href="/">Home</a>
+                
+                <a class="navbar-item" href="/archives">Archives</a>
+                
+                <a class="navbar-item" href="/categories">Categories</a>
+                
+                <a class="navbar-item" href="/tags">Tags</a>
+                
+                <a class="navbar-item" href="/about">About</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                    
+                    
+                    <a class="navbar-item" target="_blank" title="Download on GitHub" href="http://github.com/ppoffice/hexo-theme-icarus">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                    
+                
+                
+                
+                <a class="navbar-item search" title="Search" href="javascript:;">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8-tablet is-8-desktop is-6-widescreen has-order-2 column-main"><div class="card">
+    <div class="card-content">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="/tags">Tags</a></li>
+            <li class="is-active"><a href="#" aria-current="page">多线程</a></li>
+        </ul>
+        </nav>
+    </div>
+</div>
+
+    <div class="card">
+    
+    <div class="card-image">
+        <a href="/2017/12/04/proandconsu/" class="image is-7by1">
+            <img class="thumbnail" src="/css/images/consumer_producer.jpg" alt="生产者和消费者模型初探">
+        </a>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2017-12-04T11:25:11.000Z">2017-12-04</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/java/">java</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    17 minutes read (About 2515 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                <a class="has-link-black-ter" href="/2017/12/04/proandconsu/">生产者和消费者模型初探</a>
+            
+        </h1>
+        <div class="content">
+            <p>本文将尝试构造一个生产者，消费者模型，通过模型的构建，学习一下多线程编程。<br>代码见：<a href="https://github.com/llplay/muti-thread-learn" target="_blank" rel="noopener">GitHub</a></p>
+<h1 id="1-生产者消费者模型"><a href="#1-生产者消费者模型" class="headerlink" title="1.生产者消费者模型"></a>1.生产者消费者模型</h1><p>关于生产者消费者模型的基本含义不在赘述。本实验的拟构造一个生产者，从文件中按行读取数据，放入队列中，构建十个消费者，从队列中读取数据，将数据写回文件。</p>
+<h2 id="1-1-starter"><a href="#1-1-starter" class="headerlink" title="1.1 starter"></a>1.1 starter</h2><p>首先我们构造一个方法，改方法负责初始化生产者和消费者线程</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">startMutiTheads</span><span class="hljs-params">(String inputPath, String outPath)</span> </span>&#123;</span><br><span class="line">       LocalDateTime startTime = LocalDateTime.now();</span><br><span class="line">       List&lt;Thread&gt; threads = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">       LinkedBlockingQueue&lt;Optional&lt;String&gt;&gt; queue = <span class="hljs-keyword">new</span> LinkedBlockingQueue&lt;&gt;();</span><br><span class="line">       FileUtil.clearFileContents(outPath);</span><br><span class="line">       Producer producer = <span class="hljs-keyword">new</span> Producer(inputPath, queue);</span><br><span class="line">       threads.add(<span class="hljs-keyword">new</span> Thread(producer));</span><br><span class="line">       Consumer consumer = <span class="hljs-keyword">new</span> Consumer(outPath, queue);</span><br><span class="line">       <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; Consumer.consumerThreadCount; i++)&#123;</span><br><span class="line">           Thread consumerThread = <span class="hljs-keyword">new</span> Thread(consumer);</span><br><span class="line">           threads.add(consumerThread);</span><br><span class="line">           producer.addConsumer(consumer);</span><br><span class="line">       &#125;</span><br><span class="line">       threads.forEach(Thread :: start);</span><br><span class="line">       threads.forEach(thread -&gt; &#123;</span><br><span class="line">           <span class="hljs-keyword">try</span> &#123;</span><br><span class="line">               thread.join();</span><br><span class="line">           &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">               e.printStackTrace();</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br><span class="line">       consumer.getFileUtil().flushAndClose();</span><br><span class="line">       <span class="hljs-comment">// get consumer's totalCount:</span></span><br><span class="line">       logger.debug(<span class="hljs-string">"Consumer's totalCount: "</span> + consumer.getTotalCount());</span><br><span class="line">       LocalDateTime endTime = LocalDateTime.now();</span><br><span class="line">       logger.info(String.format(<span class="hljs-string">"It takes %s seconds to finish"</span>, 		LocalDateTime.from(startTime).until(endTime, ChronoUnit.SECONDS)));</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+<p>函数的有两个参数，分别表表示文件的输入路径和输出路径。<br>下面我们构建一个thread列表，该列表存储所有的线程实例。</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LinkedBlockingQueue&lt;String&gt; queue = <span class="hljs-keyword">new</span> LinkedBlockingQueue&lt;&gt;();</span><br></pre></td></tr></table></figure>
+<p>我们选用concurrent包中的LinkedBlockingQueue队列，生产者线程将内从从文件读出放至该队列，消费者线程从改队列读出数据写回到文件。</p>
+<p>LinkedBlockingQueue实现是线程安全的，实现了先进先出等特性，可以指定容量，也可以不指定，不指定的话，默认最大是Integer.MAX_VALUE，其中主要用到put和take方法，put方法在队列满的时候会阻塞直到有队列成员被消费，take方法在队列空的时候会阻塞，直到有队列成员被放进来。</p>
+<p>下面我们构建了一个生产者线程，并放到theads列表中</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Producer producer = <span class="hljs-keyword">new</span> Producer(inputPath, queue);</span><br><span class="line">threads.add(<span class="hljs-keyword">new</span> Thread(producer));</span><br></pre></td></tr></table></figure>
+<p>再之后构建十个消费者线程，其中Consumer.consumerThreadCount是在Counsmer中定义的一个静态变量，值为10</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Consumer consumer = <span class="hljs-keyword">new</span> Consumer(outPath, queue);</span><br><span class="line"><span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; Consumer.consumerThreadCount; i++)&#123;</span><br><span class="line">    Thread consumerThread = <span class="hljs-keyword">new</span> Thread(consumer);</span><br><span class="line">    threads.add(consumerThread);</span><br><span class="line">    producer.addConsumer(consumer);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>下面需要做的就是启动线程</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">threads.forEach(Thread :: start);</span><br><span class="line">threads.forEach(thread -&gt; &#123;</span><br><span class="line">    <span class="hljs-keyword">try</span> &#123;</span><br><span class="line">        thread.join();</span><br><span class="line">        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">     &#125;);</span><br></pre></td></tr></table></figure>
+<p>thread.join()方法会一直等待，直到改线程结束。</p>
+<p>以上就是starter需要做的。</p>
+<h2 id="1-2-Produce"><a href="#1-2-Produce" class="headerlink" title="1.2 Produce"></a>1.2 Produce</h2><p>本实验只设置了一个消费者模型，基本代码如下：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Producer</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="hljs-keyword">private</span> LinkedBlockingQueue&lt;Optional&lt;String&gt;&gt; queue;</span><br><span class="line">    <span class="hljs-keyword">private</span> String inputFile;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Producer</span><span class="hljs-params">(LinkedBlockingQueue&lt;Optional&lt;String&gt;&gt; queue, String inputFile)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">this</span>.queue = queue;</span><br><span class="line">        <span class="hljs-keyword">this</span>.inputFile = inputFile;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-meta">@Override</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;</span><br><span class="line">        FileUtil.readFileLineByLine(inputFile, line -&gt; &#123;</span><br><span class="line">            queue.add(Optional.of(line));</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; Consumer.consumerThreadCount; i++) &#123;</span><br><span class="line">            queue.add(Optional.empty());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>producer类只是简单的重载了Runable的run方法，run方法一开始，将文件内容读入到queue队列中，这里面用到了Java8里面lanmda表达式。</p>
+<p><code>line -&gt; {queue.add(Optional.of(line)}</code></p>
+<p>FileUtil是一个文件读取工具类，readFileLineByLine将文件按行读出到queue中,这里面同样用到了Java8中的Consumer类，关于这个类暂时按下不表，可以理解为接收一个lanmda表达式，并对每个accept的参数进行lanmda表达式的操作：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">readFileLineByLine</span><span class="hljs-params">(String filePath, Consumer&lt;String&gt; consumer)</span> </span>&#123;</span><br><span class="line">       <span class="hljs-keyword">try</span> &#123;</span><br><span class="line">           BufferedReader br = <span class="hljs-keyword">new</span> BufferedReader(<span class="hljs-keyword">new</span> InputStreamReader(<span class="hljs-keyword">new</span> FileInputStream(filePath), <span class="hljs-string">"Cp1252"</span>));</span><br><span class="line">           String line;</span><br><span class="line">           <span class="hljs-keyword">while</span> ((line = br.readLine()) != <span class="hljs-keyword">null</span>) &#123;</span><br><span class="line">               consumer.accept(line);</span><br><span class="line">           &#125;</span><br><span class="line">           br.close();</span><br><span class="line">       &#125; <span class="hljs-keyword">catch</span>(IOException e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>后面的for循环是将十个Optional空对象放入queue中，这里做的目的是实现对Consumer线程的结束控制，具体原理会在Consumer类中进行表述。Optional是Java8的特性，其官方解释是：</p>
+<p><code>这是一个可以为null的容器对象。如果值存在则isPresent()方法会返回true，调用get()方法会返回该对象</code></p>
+<p>较为通俗的说法是：</p>
+<p><code>如果你开发过Java程序，可能会有过这样的经历：调用某种数据结构的一个方法得到了返回值却不能直接将返回值作为参数去调用别的方法。而是首先判断这个返回值是否为null，只有在非空的前提下才能将其作为其他方法的参数。Java8中新加了Optional这个类正是为了解决这个问题。</code></p>
+<p>其具体用法以后解释，在本文中可简单理解为，在生产者将所有数据都写进队列后，我们放置10个空元素进入队列，消费者可根据空元素进行停止判断。</p>
+<h2 id="1-3-Consumer"><a href="#1-3-Consumer" class="headerlink" title="1.3 Consumer"></a>1.3 Consumer</h2><p>Consumer的构建也是比较简单， 同producer一样，继承Runable，并重写Run方法：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Consumer</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="hljs-keyword">private</span> AtomicInteger totalCount = <span class="hljs-keyword">new</span> AtomicInteger(<span class="hljs-number">0</span>);</span><br><span class="line">    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> consumerThreadCount = <span class="hljs-number">10</span>;</span><br><span class="line">    <span class="hljs-keyword">private</span> FileUtil fileUtil;</span><br><span class="line">    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> Logger logger = Logger.getLogger(Consumer.class);</span><br><span class="line">    <span class="hljs-keyword">private</span> LinkedBlockingQueue&lt;Optional&lt;String&gt;&gt; queue;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Consumer</span><span class="hljs-params">(LinkedBlockingQueue&lt;Optional&lt;String&gt;&gt; queue, String outputFile)</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">this</span>.queue = queue;</span><br><span class="line">        <span class="hljs-keyword">this</span>.fileUtil = <span class="hljs-keyword">new</span> FileUtil(outputFile);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-meta">@Override</span></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">try</span> &#123;</span><br><span class="line">            <span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;</span><br><span class="line">                Optional&lt;String&gt; line = queue.take();</span><br><span class="line">                <span class="hljs-keyword">if</span> (!line.isPresent()) <span class="hljs-keyword">break</span>;</span><br><span class="line">                totalCount.incrementAndGet();</span><br><span class="line">                String processedLine = fileUtil.processLine(line.get());</span><br><span class="line">                fileUtil.appendToFile(processedLine);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> FileUtil <span class="hljs-title">getFileUtil</span><span class="hljs-params">()</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">return</span> fileUtil;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getTotalCount</span><span class="hljs-params">()</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">return</span> totalCount.get();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>主要看一下run方法，run方法使用while循环，循环读取queue中的数据。上文介绍过，queue.take()方法会一直阻塞直到队列中塞进数据。此外run方法中有使用fileUtil的processLine方法：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">processLine</span><span class="hljs-params">(String line)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">int</span> min = <span class="hljs-number">1</span>;</span><br><span class="line">        <span class="hljs-keyword">int</span> max = <span class="hljs-number">100</span>;</span><br><span class="line">        <span class="hljs-keyword">int</span> randomMillisecconds = min + (<span class="hljs-keyword">int</span>)(Math.random() * ((max - min) + <span class="hljs-number">1</span>));</span><br><span class="line">        <span class="hljs-keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(randomMillisecconds);</span><br><span class="line">        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-comment">// readLineCount is not accurate in multi-thread mode</span></span><br><span class="line">        readLineCount++;</span><br><span class="line">        logger.info(String.format(<span class="hljs-string">"%d lines were read."</span>, readLineCount));</span><br><span class="line">        <span class="hljs-keyword">return</span> line;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>processLine主要是对Consumer读取的行数记性计数，并在log中打印出来。为什么这样做，未在测试实验时说明。<br>关于Consumer还有一点需要关注，我们看到Consumer的run方法体中是一个while循环，那Consumer线程什么时候会停止就变成了一个问题。按照我们设计初衷，Producer把所有的文件按行读取到queue中，Consumer回去queue中读取数据，写回到另一个文件。按照这种逻辑，如果producer读完了所有文件，Consumer也将queue中的所有数据写回文件，此时Consumer就应该停止了。</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">if</span> (!line.isPresent()) <span class="hljs-keyword">break</span>;</span><br></pre></td></tr></table></figure>
+<p>这段代码就是负责停止Consumer线程的。记得我们在Producer,当所有数据都读取到queue中时，会在queue中塞入十个optional.empty变量，那如果在Consumer中queue.take()返回的是optinal.empty，就说明queue已经无数据了，当前Consumer就可以停止了。关于如何在循环中停止线程，还有很多方法，待后面有时间再做解析。以上就是Consumer类的构造。</p>
+<h1 id="2-实验"><a href="#2-实验" class="headerlink" title="2.实验"></a>2.实验</h1><p>实验代码：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-meta">@Test</span></span><br><span class="line">   <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">multiThreadTest</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;</span><br><span class="line">       starter.startMultiThreadTask(inputFile, outputFile);</span><br><span class="line">       Assert.assertTrue(isFileDataSame(inputFile, outputFile));</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>实验结果,实验结果会打印总耗时以及两个count变量：</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">2017-03-01 13:52:04 INFO  FileUtil:118 - 2954 lines were read.</span><br><span class="line">2017-03-01 13:52:04 INFO  FileUtil:118 - 2955 lines were read.</span><br><span class="line">2017-03-01 13:52:04 INFO  FileUtil:118 - 2956 lines were read.</span><br><span class="line">2017-03-01 13:52:04 INFO  FileUtil:118 - 2957 lines were read.</span><br><span class="line">2017-03-01 13:52:04 INFO  FileUtil:118 - 2958 lines were read.</span><br><span class="line">2017-03-01 13:52:04 DEBUG Starter:50 - Consumer&apos;s totalCount: 3000</span><br><span class="line">2017-03-01 13:52:04 INFO  Starter:53 - It takes 16 seconds to finish</span><br></pre></td></tr></table></figure>
+<p>解释一下，诸如2958 lines were read，是从FileUtil工具类processLine函数中打印出的readLine变量，其代表意义是线程Consumer线程从queue中读取了多少行。Consumer’s totalCount: 3000 是直接打印的Consumer全局变totalCount，其代表意义同样是十个线程总共从queue中读取了多少行，按道理来说，这两个值是应该相同的，然后结果明显不一致。</p>
+<p>从代码我们可以看到readLine是一个int型变量，而totalCount是一个AtomicInteger变量，很显然问题出在了这里。我们知道Java中++这种操作是线程不安全的，而readLineCount是个全局变量，所以如果多个线程同事在执行++操作时，就会产生totalCount的值不一致的问题，解决方法可以粗暴的在processLine中加上synchronized关键字：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">processLine</span><span class="hljs-params">(String line)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;</span><br><span class="line">       <span class="hljs-keyword">synchronized</span> (<span class="hljs-keyword">this</span>) &#123;</span><br><span class="line">           <span class="hljs-keyword">int</span> min = <span class="hljs-number">1</span>;</span><br><span class="line">           <span class="hljs-keyword">int</span> max = <span class="hljs-number">100</span>;</span><br><span class="line">           <span class="hljs-keyword">int</span> randomMillisecconds = min + (<span class="hljs-keyword">int</span>) (Math.random() * ((max - min) + <span class="hljs-number">1</span>));</span><br><span class="line">           <span class="hljs-keyword">try</span> &#123;</span><br><span class="line">               Thread.sleep(randomMillisecconds);</span><br><span class="line">           &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">               e.printStackTrace();</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="hljs-comment">// readLineCount is not accurate in multi-thread mode</span></span><br><span class="line">           readLineCount++;</span><br><span class="line">           logger.info(String.format(<span class="hljs-string">"%d lines were read."</span>, readLineCount));</span><br><span class="line">           <span class="hljs-keyword">return</span> line;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>我们再次运行测试脚本：</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">2017-03-01 14:09:34 INFO  FileUtil:119 - 2994 lines were read.</span><br><span class="line">2017-03-01 14:09:34 INFO  FileUtil:119 - 2995 lines were read.</span><br><span class="line">2017-03-01 14:09:34 INFO  FileUtil:119 - 2996 lines were read.</span><br><span class="line">2017-03-01 14:09:34 INFO  FileUtil:119 - 2997 lines were read.</span><br><span class="line">2017-03-01 14:09:35 INFO  FileUtil:119 - 2998 lines were read.</span><br><span class="line">2017-03-01 14:09:35 INFO  FileUtil:119 - 2999 lines were read.</span><br><span class="line">2017-03-01 14:09:35 INFO  FileUtil:119 - 3000 lines were read.</span><br><span class="line">2017-03-01 14:09:35 DEBUG Starter:50 - Consumer&apos;s totalCount: 3000</span><br><span class="line">2017-03-01 14:09:35 INFO  Starter:53 - It takes 160 seconds to finish</span><br></pre></td></tr></table></figure>
+<p>可以看到两个变量的值相等了，说明这种方法可行，但是花费的时间确从16s到了160s，说明synchronized关键字极大的增加了时间的消耗，我们分析processLine方法，其实问题只出在readLineCount上，concurrent包中提供了AtomicInteger变量，它实现了对int变量的封装，实现了对自增操作的原子性。为此我们将readLineCount定义为：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">private</span> AtomicInteger readLineCount = <span class="hljs-keyword">new</span> AtomicInteger(<span class="hljs-number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>processLine函数变为：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">processLine</span><span class="hljs-params">(String line)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;</span><br><span class="line">       <span class="hljs-keyword">int</span> min = <span class="hljs-number">1</span>;</span><br><span class="line">       <span class="hljs-keyword">int</span> max = <span class="hljs-number">100</span>;</span><br><span class="line">       <span class="hljs-keyword">int</span> randomMillisecconds = min + (<span class="hljs-keyword">int</span>) (Math.random() * ((max - min) + <span class="hljs-number">1</span>));</span><br><span class="line">       <span class="hljs-keyword">try</span> &#123;</span><br><span class="line">           Thread.sleep(randomMillisecconds);</span><br><span class="line">       &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="hljs-comment">// readLineCount is not accurate in multi-thread mode</span></span><br><span class="line">       readLineCount.incrementAndGet();</span><br><span class="line">       logger.info(String.format(<span class="hljs-string">"%d lines were read."</span>, readLineCount.get()));</span><br><span class="line">       <span class="hljs-keyword">return</span> line;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>再次运行测试代码：</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">2017-03-01 14:18:23 INFO  FileUtil:120 - 2994 lines were read.</span><br><span class="line">2017-03-01 14:18:23 INFO  FileUtil:120 - 2995 lines were read.</span><br><span class="line">2017-03-01 14:18:23 INFO  FileUtil:120 - 2996 lines were read.</span><br><span class="line">2017-03-01 14:18:23 INFO  FileUtil:120 - 2997 lines were read.</span><br><span class="line">2017-03-01 14:18:23 INFO  FileUtil:120 - 2998 lines were read.</span><br><span class="line">2017-03-01 14:18:23 INFO  FileUtil:120 - 2999 lines were read.</span><br><span class="line">2017-03-01 14:18:23 INFO  FileUtil:120 - 3000 lines were read.</span><br><span class="line">2017-03-01 14:18:23 DEBUG Starter:50 - Consumer&apos;s totalCount: 3000</span><br><span class="line">2017-03-01 14:18:23 INFO  Starter:53 - It takes 15 seconds to finish</span><br></pre></td></tr></table></figure>
+<p>可以看到，两个变量值相等了，然后耗时只用了15s。<br>从以上实验可以看到使用concurrent包中的变量和方法，比简单粗暴的使用synchronized这种方法在耗时方便具有很大的优势。</p>
+<h1 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h1><p>以上我们初步试验了一个简单的生产者消费者模型，使用了Cocurrent包中的一些方法。时间比较急，先写这么多，后续有内容再行添加。</p>
+
+        </div>
+        
+        
+        
+    </div>
+</div>
+
+
+
+
+
+
+
+
+</div>
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen  has-order-1 column-left ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <nav class="level">
+            <div class="level-item has-text-centered">
+                <div>
+                    
+                        <img class="image is-128x128 has-mb-6" src="/css/images/helloworld.png" alt="Lingduo Yang">
+                    
+                    
+                    <p class="is-size-4 is-block">
+                        Lingduo Yang
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-block">
+                        R&amp;D
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-flex is-flex-center has-text-grey">
+                        <i class="fas fa-map-marker-alt has-mr-7"></i>
+                        <span>Beijing</span>
+                    </p>
+                    
+                </div>
+            </div>
+        </nav>
+        <nav class="level is-mobile">
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Posts
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        4
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Categories
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        3
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Tags
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        6
+                    </p>
+                </div>
+            </div>
+        </nav>
+        <div class="level">
+            <a class="level-item button is-link is-rounded" href="http://github.com/ppoffice" target="_blank">
+                Follow</a>
+        </div>
+        
+        
+        <div class="level is-mobile">
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Github" href="http://github.com/ppoffice">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Facebook" href="http://facebook.com">
+                
+                <i class="fab fa-facebook"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Twitter" href="http://twitter.com">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Dribbble" href="http://dribbble.com">
+                
+                <i class="fab fa-dribbble"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="RSS" href="/">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+            
+        </div>
+        
+    </div>
+</div>
+    
+        
+    
+        
+
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Links
+        </h3>
+        <ul class="menu-list">
+        
+            <li>
+                <a class="level is-mobile" href="https://hexo.io" target="_blank">
+                    <span class="level-left">
+                        <span class="level-item">Hexo</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">hexo.io</span>
+                    </span>
+                </a>
+            </li>
+        
+            <li>
+                <a class="level is-mobile" href="https://github.com/ppoffice" target="_blank">
+                    <span class="level-left">
+                        <span class="level-item">PPOffice</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">github.com</span>
+                    </span>
+                </a>
+            </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+
+
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Categories
+            </h3>
+            <ul class="menu-list">
+            <li>
+        <a class="level is-marginless" href="/categories/Python/">
+            <span class="level-start">
+                <span class="level-item">Python</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">2</span>
+            </span>
+        </a><ul><li>
+        <a class="level is-marginless" href="/categories/Python/Go/">
+            <span class="level-start">
+                <span class="level-item">Go</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">1</span>
+            </span>
+        </a></li></ul></li><li>
+        <a class="level is-marginless" href="/categories/java/">
+            <span class="level-start">
+                <span class="level-item">java</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">2</span>
+            </span>
+        </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Tag Cloud
+        </h3>
+        <a href="/tags/单例模式/" style="font-size: 10px;">单例模式</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/生产者消费者模型/" style="font-size: 10px;">生产者消费者模型</a> <a href="/tags/线程安全/" style="font-size: 10px;">线程安全</a> <a href="/tags/装饰器/" style="font-size: 10px;">装饰器</a> <a href="/tags/闭包/" style="font-size: 10px;">闭包</a>
+    </div>
+</div>
+
+    
+    
+        <div class="column-right-shadow is-hidden-widescreen ">
+        
+            
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Recent
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/03/22/decorator_2/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/closure.jpg" alt="Python闭包和go闭包">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-03-22T08:49:15.000Z">2019-03-22</time></div>
+                    <a href="/2019/03/22/decorator_2/" class="has-link-black-ter is-size-6">Python闭包和go闭包</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Python/">Python</a> / <a class="has-link-grey -link" href="/categories/Python/Go/">Go</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/12/05/decorator/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/decorator.jpg" alt="Python中的装饰器">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-05T08:49:15.000Z">2017-12-05</time></div>
+                    <a href="/2017/12/05/decorator/" class="has-link-black-ter is-size-6">Python中的装饰器</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Python/">Python</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/12/05/safe-singleton/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/thread-safe-singleton.jpg" alt="一个线程安全的单例模式">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-05T02:30:21.000Z">2017-12-05</time></div>
+                    <a href="/2017/12/05/safe-singleton/" class="has-link-black-ter is-size-6">一个线程安全的单例模式</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/12/04/proandconsu/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/consumer_producer.jpg" alt="生产者和消费者模型初探">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-04T11:25:11.000Z">2017-12-04</time></div>
+                    <a href="/2017/12/04/proandconsu/" class="has-link-black-ter is-size-6">生产者和消费者模型初探</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Archives
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/03/">
+                <span class="level-start">
+                    <span class="level-item">March 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/12/">
+                <span class="level-start">
+                    <span class="level-item">December 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">3</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Tags
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/单例模式/">
+                        <span class="tag">单例模式</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/多线程/">
+                        <span class="tag">多线程</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/生产者消费者模型/">
+                        <span class="tag">生产者消费者模型</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/线程安全/">
+                        <span class="tag">线程安全</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/装饰器/">
+                        <span class="tag">装饰器</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/闭包/">
+                        <span class="tag">闭包</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+        
+        </div>
+    
+</div>
+
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only has-order-3 column-right ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Recent
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/03/22/decorator_2/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/closure.jpg" alt="Python闭包和go闭包">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-03-22T08:49:15.000Z">2019-03-22</time></div>
+                    <a href="/2019/03/22/decorator_2/" class="has-link-black-ter is-size-6">Python闭包和go闭包</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Python/">Python</a> / <a class="has-link-grey -link" href="/categories/Python/Go/">Go</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/12/05/decorator/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/decorator.jpg" alt="Python中的装饰器">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-05T08:49:15.000Z">2017-12-05</time></div>
+                    <a href="/2017/12/05/decorator/" class="has-link-black-ter is-size-6">Python中的装饰器</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Python/">Python</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/12/05/safe-singleton/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/thread-safe-singleton.jpg" alt="一个线程安全的单例模式">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-05T02:30:21.000Z">2017-12-05</time></div>
+                    <a href="/2017/12/05/safe-singleton/" class="has-link-black-ter is-size-6">一个线程安全的单例模式</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/12/04/proandconsu/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/consumer_producer.jpg" alt="生产者和消费者模型初探">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-04T11:25:11.000Z">2017-12-04</time></div>
+                    <a href="/2017/12/04/proandconsu/" class="has-link-black-ter is-size-6">生产者和消费者模型初探</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/java/">java</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Archives
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/03/">
+                <span class="level-start">
+                    <span class="level-item">March 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/12/">
+                <span class="level-start">
+                    <span class="level-item">December 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">3</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Tags
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/单例模式/">
+                        <span class="tag">单例模式</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/多线程/">
+                        <span class="tag">多线程</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/生产者消费者模型/">
+                        <span class="tag">生产者消费者模型</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/线程安全/">
+                        <span class="tag">线程安全</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/装饰器/">
+                        <span class="tag">装饰器</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/闭包/">
+                        <span class="tag">闭包</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</div>
+
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <a class="footer-logo is-block has-mb-6" href="/">
+                
+                    <img src="/images/logo.svg" alt="duoduo" height="28">
+                
+                </a>
+                <p class="is-size-7">
+                &copy; 2019 lingduo.yang&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
+                
+                </p>
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Creative Commons" href="https://creativecommons.org/">
+                        
+                        <i class="fab fa-creative-commons"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
+                        
+                        <i class="fab fa-creative-commons-by"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Download on GitHub" href="http://github.com/ppoffice/hexo-theme-icarus">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("en");</script>
+
+
+    
+    
+    
+    <script src="/js/animation.js"></script>
+    
+
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+    <script src="/js/gallery.js" defer></script>
+    
+
+    
+    
+
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+
+    
+    
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    MathJax.Hub.Config({
+        'HTML-CSS': {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+});
+</script>
+
+    
+    
+
+<a id="back-to-top" title="Back to Top" href="javascript:;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+    <script src="/js/clipboard.js" defer></script>
+    
+
+    
+    
+    
+
+
+<script src="/js/main.js" defer></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+</body>
+</html>
