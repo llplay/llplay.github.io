@@ -148,8 +148,68 @@
     <div class="card">
     
     <div class="card-image">
+        <a href="/2019/04/11/go_intro/" class="image is-7by1">
+            <img class="thumbnail" src="/css/images/golang.png" alt="关于go语言的介绍-《Go In Action》-Ch1">
+        </a>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    4 minutes read (About 528 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                <a class="has-link-black-ter" href="/2019/04/11/go_intro/">关于go语言的介绍-《Go In Action》-Ch1</a>
+            
+        </h1>
+        <div class="content">
+            <h2 id="1-1-Go-解决现代编程的难题"><a href="#1-1-Go-解决现代编程的难题" class="headerlink" title="1.1 Go 解决现代编程的难题"></a>1.1 Go 解决现代编程的难题</h2><h3 id="1-1-1-开发速度"><a href="#1-1-1-开发速度" class="headerlink" title="1.1.1 开发速度"></a>1.1.1 开发速度</h3><p>更加智能的编译器，简化依赖算法，编译速度更快，只会关注直接被引用的库<br>编译器提供类型检查</p>
+<h3 id="1-1-2-并发"><a href="#1-1-2-并发" class="headerlink" title="1.1.2 并发"></a>1.1.2 并发</h3><p>提供并发支持，goroutine比线程更轻量级的并发，内置channel，在不同goroutine之间通信</p>
+<h4 id="1-goroutine"><a href="#1-goroutine" class="headerlink" title="1.goroutine"></a>1.goroutine</h4><p>goroutine是可以和其他goroutine并行执行的函数，使用的内存更少。运行时会自动的配置一组逻辑处理器执行goroutine，每个逻辑处理器绑定到一个操作系统线程上，程序实行效率更高<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">log</span><span class="hljs-params">(msg <span class="hljs-keyword">string</span>)</span></span> &#123;</span><br><span class="line">	....</span><br><span class="line">&#125;</span><br><span class="line"><span class="hljs-keyword">go</span> log(<span class="hljs-string">"blablabla"</span>)</span><br></pre></td></tr></table></figure></p>
+<h4 id="2-channel"><a href="#2-channel" class="headerlink" title="2.channel"></a>2.channel</h4><p>channel是可以让goroutine之间进行安全通信的工具，避免共享内存访问的问题，保证同一时刻只会有一个goroutine修改数据, 但是channel并不提供跨goroutine的数据访问保护机制，<br>如果传输的是副本，那么每个goroutine都持有一个副本，各自对副本修改是安全的。但是如果传输的诗指针时，还是需要额外的同步动作</p>
+<h3 id="1-1-3-Go语言的类型系统"><a href="#1-1-3-Go语言的类型系统" class="headerlink" title="1.1.3 Go语言的类型系统"></a>1.1.3 Go语言的类型系统</h3><p>无继承，使用组合设计模式，具有接口机制对行为进行建模</p>
+<h4 id="1-类型简单"><a href="#1-类型简单" class="headerlink" title="1. 类型简单"></a>1. 类型简单</h4><p>内置简单类型，支持自定义类型，使用组合来支持扩展</p>
+<h4 id="2-Go接口对一组行为建模"><a href="#2-Go接口对一组行为建模" class="headerlink" title="2.Go接口对一组行为建模"></a>2.Go接口对一组行为建模</h4><p>一个类型实现了一个接口的所有方法，那么这个类型的实例就可以存储在这个接口类型的实例中，不需要额外声明<br>Go语言的整个网络库都是用了io.Reader接口，这样可以将程序的功能和不同的网络实现分离，任何实现了open方法的类型，都实现了io.Reader接口<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">//io.Reader</span></span><br><span class="line"><span class="hljs-keyword">type</span> Reader <span class="hljs-keyword">interface</span>&#123;</span><br><span class="line">	Read(p []<span class="hljs-keyword">byte</span>) (n <span class="hljs-keyword">int</span>, err error)	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="1-1-3-内存管理"><a href="#1-1-3-内存管理" class="headerlink" title="1.1.3 内存管理"></a>1.1.3 内存管理</h3><p>Golang提供GC</p>
+<h2 id="1-2-Hello-Go"><a href="#1-2-Hello-Go" class="headerlink" title="1.2 Hello Go"></a>1.2 Hello Go</h2><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"><span class="hljs-keyword">import</span> <span class="hljs-string">"fmt"</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="hljs-string">"Hello World"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a href="http://play.golang.org" target="_blank" rel="noopener">Go Playground</a>是提供在线编辑运行Go的网站</p>
+
+        </div>
+        
+        
+        
+    </div>
+</div>
+
+
+
+
+
+
+
+
+    <div class="card">
+    
+    <div class="card-image">
         <a href="/2019/04/11/go_quick_prog/" class="image is-7by1">
-            <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-快速开始一个GO程序">
+            <img class="thumbnail" src="/css/images/golang.png" alt="快速开始一个GO程序-《Go In Action》-Ch2">
         </a>
     </div>
     
@@ -176,7 +236,7 @@
         
         <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
             
-                <a class="has-link-black-ter" href="/2019/04/11/go_quick_prog/">GIA-Ch1-快速开始一个GO程序</a>
+                <a class="has-link-black-ter" href="/2019/04/11/go_quick_prog/">快速开始一个GO程序-《Go In Action》-Ch2</a>
             
         </h1>
         <div class="content">
@@ -223,66 +283,6 @@
 <li>标准库包含很多包，能做很多很有用的事情。</li>
 <li>使用Go 接口可以编写通用的代码和框架。</li>
 </ul>
-
-        </div>
-        
-        
-        
-    </div>
-</div>
-
-
-
-
-
-
-
-
-    <div class="card">
-    
-    <div class="card-image">
-        <a href="/2019/04/11/go_intro/" class="image is-7by1">
-            <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-关于go语言的介绍">
-        </a>
-    </div>
-    
-    <div class="card-content article ">
-        
-        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
-            <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time>
-                
-                <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
-                </div>
-                
-                
-                <span class="level-item has-text-grey">
-                    
-                    
-                    4 minutes read (About 528 words)
-                </span>
-                
-                
-            </div>
-        </div>
-        
-        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
-            
-                <a class="has-link-black-ter" href="/2019/04/11/go_intro/">GIA-Ch1-关于go语言的介绍</a>
-            
-        </h1>
-        <div class="content">
-            <h2 id="1-1-Go-解决现代编程的难题"><a href="#1-1-Go-解决现代编程的难题" class="headerlink" title="1.1 Go 解决现代编程的难题"></a>1.1 Go 解决现代编程的难题</h2><h3 id="1-1-1-开发速度"><a href="#1-1-1-开发速度" class="headerlink" title="1.1.1 开发速度"></a>1.1.1 开发速度</h3><p>更加智能的编译器，简化依赖算法，编译速度更快，只会关注直接被引用的库<br>编译器提供类型检查</p>
-<h3 id="1-1-2-并发"><a href="#1-1-2-并发" class="headerlink" title="1.1.2 并发"></a>1.1.2 并发</h3><p>提供并发支持，goroutine比线程更轻量级的并发，内置channel，在不同goroutine之间通信</p>
-<h4 id="1-goroutine"><a href="#1-goroutine" class="headerlink" title="1.goroutine"></a>1.goroutine</h4><p>goroutine是可以和其他goroutine并行执行的函数，使用的内存更少。运行时会自动的配置一组逻辑处理器执行goroutine，每个逻辑处理器绑定到一个操作系统线程上，程序实行效率更高<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">log</span><span class="hljs-params">(msg <span class="hljs-keyword">string</span>)</span></span> &#123;</span><br><span class="line">	....</span><br><span class="line">&#125;</span><br><span class="line"><span class="hljs-keyword">go</span> log(<span class="hljs-string">"blablabla"</span>)</span><br></pre></td></tr></table></figure></p>
-<h4 id="2-channel"><a href="#2-channel" class="headerlink" title="2.channel"></a>2.channel</h4><p>channel是可以让goroutine之间进行安全通信的工具，避免共享内存访问的问题，保证同一时刻只会有一个goroutine修改数据, 但是channel并不提供跨goroutine的数据访问保护机制，<br>如果传输的是副本，那么每个goroutine都持有一个副本，各自对副本修改是安全的。但是如果传输的诗指针时，还是需要额外的同步动作</p>
-<h3 id="1-1-3-Go语言的类型系统"><a href="#1-1-3-Go语言的类型系统" class="headerlink" title="1.1.3 Go语言的类型系统"></a>1.1.3 Go语言的类型系统</h3><p>无继承，使用组合设计模式，具有接口机制对行为进行建模</p>
-<h4 id="1-类型简单"><a href="#1-类型简单" class="headerlink" title="1. 类型简单"></a>1. 类型简单</h4><p>内置简单类型，支持自定义类型，使用组合来支持扩展</p>
-<h4 id="2-Go接口对一组行为建模"><a href="#2-Go接口对一组行为建模" class="headerlink" title="2.Go接口对一组行为建模"></a>2.Go接口对一组行为建模</h4><p>一个类型实现了一个接口的所有方法，那么这个类型的实例就可以存储在这个接口类型的实例中，不需要额外声明<br>Go语言的整个网络库都是用了io.Reader接口，这样可以将程序的功能和不同的网络实现分离，任何实现了open方法的类型，都实现了io.Reader接口<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">//io.Reader</span></span><br><span class="line"><span class="hljs-keyword">type</span> Reader <span class="hljs-keyword">interface</span>&#123;</span><br><span class="line">	Read(p []<span class="hljs-keyword">byte</span>) (n <span class="hljs-keyword">int</span>, err error)	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<h3 id="1-1-3-内存管理"><a href="#1-1-3-内存管理" class="headerlink" title="1.1.3 内存管理"></a>1.1.3 内存管理</h3><p>Golang提供GC</p>
-<h2 id="1-2-Hello-Go"><a href="#1-2-Hello-Go" class="headerlink" title="1.2 Hello Go"></a>1.2 Hello Go</h2><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"><span class="hljs-keyword">import</span> <span class="hljs-string">"fmt"</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="hljs-string">"Hello World"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><a href="http://play.golang.org" target="_blank" rel="noopener">Go Playground</a>是提供在线编辑运行Go的网站</p>
 
         </div>
         
@@ -511,16 +511,16 @@
         
         <article class="media">
             
-            <a href="/2019/04/11/go_quick_prog/" class="media-left">
+            <a href="/2019/04/11/go_intro/" class="media-left">
                 <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-快速开始一个GO程序">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="关于go语言的介绍-《Go In Action》-Ch1">
                 </p>
             </a>
             
             <div class="media-content">
                 <div class="content">
                     <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time></div>
-                    <a href="/2019/04/11/go_quick_prog/" class="has-link-black-ter is-size-6">GIA-Ch1-快速开始一个GO程序</a>
+                    <a href="/2019/04/11/go_intro/" class="has-link-black-ter is-size-6">关于go语言的介绍-《Go In Action》-Ch1</a>
                     <p class="is-size-7 is-uppercase">
                         <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
                     </p>
@@ -530,16 +530,16 @@
         
         <article class="media">
             
-            <a href="/2019/04/11/go_intro/" class="media-left">
+            <a href="/2019/04/11/go_quick_prog/" class="media-left">
                 <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-关于go语言的介绍">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="快速开始一个GO程序-《Go In Action》-Ch2">
                 </p>
             </a>
             
             <div class="media-content">
                 <div class="content">
                     <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time></div>
-                    <a href="/2019/04/11/go_intro/" class="has-link-black-ter is-size-6">GIA-Ch1-关于go语言的介绍</a>
+                    <a href="/2019/04/11/go_quick_prog/" class="has-link-black-ter is-size-6">快速开始一个GO程序-《Go In Action》-Ch2</a>
                     <p class="is-size-7 is-uppercase">
                         <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
                     </p>
@@ -736,16 +736,16 @@
         
         <article class="media">
             
-            <a href="/2019/04/11/go_quick_prog/" class="media-left">
+            <a href="/2019/04/11/go_intro/" class="media-left">
                 <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-快速开始一个GO程序">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="关于go语言的介绍-《Go In Action》-Ch1">
                 </p>
             </a>
             
             <div class="media-content">
                 <div class="content">
                     <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time></div>
-                    <a href="/2019/04/11/go_quick_prog/" class="has-link-black-ter is-size-6">GIA-Ch1-快速开始一个GO程序</a>
+                    <a href="/2019/04/11/go_intro/" class="has-link-black-ter is-size-6">关于go语言的介绍-《Go In Action》-Ch1</a>
                     <p class="is-size-7 is-uppercase">
                         <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
                     </p>
@@ -755,16 +755,16 @@
         
         <article class="media">
             
-            <a href="/2019/04/11/go_intro/" class="media-left">
+            <a href="/2019/04/11/go_quick_prog/" class="media-left">
                 <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-关于go语言的介绍">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="快速开始一个GO程序-《Go In Action》-Ch2">
                 </p>
             </a>
             
             <div class="media-content">
                 <div class="content">
                     <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time></div>
-                    <a href="/2019/04/11/go_intro/" class="has-link-black-ter is-size-6">GIA-Ch1-关于go语言的介绍</a>
+                    <a href="/2019/04/11/go_quick_prog/" class="has-link-black-ter is-size-6">快速开始一个GO程序-《Go In Action》-Ch2</a>
                     <p class="is-size-7 is-uppercase">
                         <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
                     </p>
