@@ -137,6 +137,99 @@
     <div class="card">
     
     <div class="card-image">
+        <a href="/2019/04/11/go_quick_prog/" class="image is-7by1">
+            <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-快速开始一个GO程序">
+        </a>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    17 minutes read (About 2562 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                <a class="has-link-black-ter" href="/2019/04/11/go_quick_prog/">GIA-Ch1-快速开始一个GO程序</a>
+            
+        </h1>
+        <div class="content">
+            <p>一上来接来个大程序，新手能接得住么<br>这个程序从不同的数据源拉取数据，将数据内容与一组搜索项做对比，然后将匹配的内容显示在终端窗口。这个程序会读取文本文件，<br>进行网络调用，解码XML 和JSON 成为结构化类型数据，并且利用Go 语言的并发<br>机制保证这些操作的速度<a href="https://github.com/goinaction/code/tree/master/chapter2/sample" target="_blank" rel="noopener">source code</a></p>
+<h2 id="2-1-程序架构"><a href="#2-1-程序架构" class="headerlink" title="2.1 程序架构"></a>2.1 程序架构</h2><figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- sample</span><br><span class="line">	- data</span><br><span class="line">		data.json -- 包含一组数据源</span><br><span class="line">	- matchers</span><br><span class="line">		rss.go -- 搜索 rss 源的匹配器</span><br><span class="line">	- search</span><br><span class="line">		default.go -- 搜索数据用的默认匹配器</span><br><span class="line">		feed.go -- 用于读取 json 数据文件</span><br><span class="line">		match.go -- 用于支持不同匹配器的接口</span><br><span class="line">		search.go -- 执行搜索的主控制逻辑</span><br><span class="line">	main.go -- 程序的入口</span><br></pre></td></tr></table></figure>
+<h2 id="2-2-main-包"><a href="#2-2-main-包" class="headerlink" title="2.2 main 包"></a>2.2 main 包</h2><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"log"</span></span><br><span class="line">	<span class="hljs-string">"os"</span></span><br><span class="line"></span><br><span class="line">	_ <span class="hljs-string">"github.com/goinaction/code/chapter2/sample/matchers"</span></span><br><span class="line">	<span class="hljs-string">"github.com/goinaction/code/chapter2/sample/search"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// init is called prior to main.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Change the device for logging to stdout.</span></span><br><span class="line">	log.SetOutput(os.Stdout)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main is the entry point for the program.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Perform the search for the specified term.</span></span><br><span class="line">	search.Run(<span class="hljs-string">"president"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有以下几点需要注意：</p>
+<ul>
+<li>main()是程序的入口，没有main函数，构建程序不会生成可执行文件</li>
+<li>一个包定义一组编译通过的代码，包的名字类似命名空间，可以用来直接访问包内生命的标识符， 可以报不同包中定义的同名标识符区别开</li>
+<li>下划线开头的包，是为了进行包的初始化操作，GO不允许声明导入包却不使用，下划线让编译器接受这种到日，并且调用对应包内所有文件代码里定义的init函数，init函数的执行在main函数之前</li>
+</ul>
+<h2 id="2-3-search-包"><a href="#2-3-search-包" class="headerlink" title="2.3 search 包"></a>2.3 search 包</h2><p>serach 包包含了程序使用的框架和业务逻辑</p>
+<h3 id="2-3-1-serach-go"><a href="#2-3-1-serach-go" class="headerlink" title="2.3.1 serach.go"></a>2.3.1 serach.go</h3><p>serach文件先获取数据源，然后对每个数据源获取的数据进行匹配，每一个匹配启用一个goroutine。使用sync.WaitGroup控制任务是否完成。<br>sync.WaitGroup是一个计数信号量，主要有三个方法Add、Done和Wait，每增加一个任务就Add一次，每完成一个任务就Done一次，调用Wait的时候程序会阻塞，直到所有任务完成。</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> search</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">//从标准库导入代码时，只需要给出要导入包的包名，</span></span><br><span class="line"><span class="hljs-comment">//编译器查找包时，总是会到GOROOT和GOPATH环境变量引用的位置去查找</span></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"log"</span></span><br><span class="line">	<span class="hljs-string">"sync"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// A map of registered matchers for searching.</span></span><br><span class="line"><span class="hljs-comment">// 小写字母标识，标识包内变量，不导出 or 不公开</span></span><br><span class="line"><span class="hljs-keyword">var</span> matchers = <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]Matcher)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Run performs the search logic.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Run</span><span class="hljs-params">(searchTerm <span class="hljs-keyword">string</span>)</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Retrieve the list of feeds to search through.</span></span><br><span class="line">	feeds, err := RetrieveFeeds()</span><br><span class="line">	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;</span><br><span class="line">		log.Fatal(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Create an unbuffered channel to receive match results to display.</span></span><br><span class="line">	results := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> *Result)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Setup a wait group so we can process all the feeds.</span></span><br><span class="line">	<span class="hljs-keyword">var</span> waitGroup sync.WaitGroup</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Set the number of goroutines we need to wait for while</span></span><br><span class="line">	<span class="hljs-comment">// they process the individual feeds.</span></span><br><span class="line">	waitGroup.Add(<span class="hljs-built_in">len</span>(feeds))</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Launch a goroutine for each feed to find the results.</span></span><br><span class="line">	<span class="hljs-keyword">for</span> _, feed := <span class="hljs-keyword">range</span> feeds &#123;</span><br><span class="line">		<span class="hljs-comment">// Retrieve a matcher for the search.</span></span><br><span class="line">		matcher, exists := matchers[feed.Type]</span><br><span class="line">		<span class="hljs-keyword">if</span> !exists &#123;</span><br><span class="line">			matcher = matchers[<span class="hljs-string">"default"</span>]</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="hljs-comment">// Launch the goroutine to perform the search.</span></span><br><span class="line">		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(matcher Matcher, feed *Feed)</span></span> &#123;</span><br><span class="line">			Match(matcher, feed, searchTerm, results)</span><br><span class="line">			waitGroup.Done()</span><br><span class="line">		&#125;(matcher, feed)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Launch a goroutine to monitor when all the work is done.</span></span><br><span class="line">	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">		<span class="hljs-comment">// Wait for everything to be processed.</span></span><br><span class="line">		waitGroup.Wait()</span><br><span class="line"></span><br><span class="line">		<span class="hljs-comment">// Close the channel to signal to the Display</span></span><br><span class="line">		<span class="hljs-comment">// function that we can exit the program.</span></span><br><span class="line">		<span class="hljs-built_in">close</span>(results)</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Start displaying results as they are available and</span></span><br><span class="line">	<span class="hljs-comment">// return after the final result is displayed.</span></span><br><span class="line">	Display(results)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Register is called to register a matcher for use by the program.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Register</span><span class="hljs-params">(feedType <span class="hljs-keyword">string</span>, matcher Matcher)</span></span> &#123;</span><br><span class="line">	<span class="hljs-keyword">if</span> _, exists := matchers[feedType]; exists &#123;</span><br><span class="line">		log.Fatalln(feedType, <span class="hljs-string">"Matcher already registered"</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	log.Println(<span class="hljs-string">"Register"</span>, feedType, <span class="hljs-string">"matcher"</span>)</span><br><span class="line">	matchers[feedType] = matcher</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于上面代码，有以下问题需要明确下：</p>
+<ul>
+<li>feeds, err := RetrieveFeeds() 这种一个函数返回两个值，第一个参数返回值，第二个返回错误信息，是GO中常用的模式</li>
+<li>声明运算符（:=），这个运算符在声明变量的同时，给变量赋值</li>
+<li>feeds 是一个切片，可以理解为Go里面的动态数组，是一种引用类型</li>
+<li>results是一个无缓冲的channel，和map、slice一样，都是引用类型，channel内置同步机制，从而保证通信安全</li>
+<li>Go中，如果main函数返回，整个程序也就终止了，终止时，会关闭所有之前启动而且还在运行的goroutine</li>
+<li>for range对feeds切片做迭代，和python里面的 for in一样的道理，每次迭代会返回两个值（index，value），value是一个副本，下划线_是一个占位符</li>
+<li>使用go关键字启动一个goroutine，并对这个goroutine做并发调度。上面程序中go启动了一个匿名函数作为goroutine</li>
+<li>在Go语言中，所有的变量都是以值的方式传递。所以想要修改真正的值，可以传递指针</li>
+<li>Go语言支持闭包，匿名函数中访问searchTerm、results就是通过闭包的形势访问的。注意matcher、feed这两个变量并没有使用闭包的形式访问</li>
+</ul>
+<h3 id="2-3-2-feed-go"><a href="#2-3-2-feed-go" class="headerlink" title="2.3.2 feed.go"></a>2.3.2 feed.go</h3><p>feed会从本地的data/data.json中读取Json数据，并将数据反序列化为feed切片,defer会安排随后的函数调用在函数返回时才执行, 使用defer可以缩短打开文件和关闭文件的代码间隔</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> search</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"encoding/json"</span></span><br><span class="line">	<span class="hljs-string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">const</span> dataFile = <span class="hljs-string">"data/data.json"</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Feed contains information we need to process a feed.</span></span><br><span class="line"><span class="hljs-keyword">type</span> Feed <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="hljs-keyword">string</span> <span class="hljs-string">`json:"site"`</span></span><br><span class="line">	URI  <span class="hljs-keyword">string</span> <span class="hljs-string">`json:"link"`</span></span><br><span class="line">	Type <span class="hljs-keyword">string</span> <span class="hljs-string">`json:"type"`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// RetrieveFeeds reads and unmarshals the feed data file.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">RetrieveFeeds</span><span class="hljs-params">()</span> <span class="hljs-params">([]*Feed, error)</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Open the file.</span></span><br><span class="line">	file, err := os.Open(dataFile)</span><br><span class="line">	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;</span><br><span class="line">		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Schedule the file to be closed once</span></span><br><span class="line">	<span class="hljs-comment">// the function returns.</span></span><br><span class="line">	<span class="hljs-keyword">defer</span> file.Close()</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Decode the file into a slice of pointers</span></span><br><span class="line">	<span class="hljs-comment">// to Feed values.</span></span><br><span class="line">	<span class="hljs-keyword">var</span> feeds []*Feed</span><br><span class="line">	err = json.NewDecoder(file).Decode(&amp;feeds)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// We don't need to check for errors, the caller can do this.</span></span><br><span class="line">	<span class="hljs-keyword">return</span> feeds, err</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-3-3-match-go-default-go"><a href="#2-3-3-match-go-default-go" class="headerlink" title="2.3.3 match.go/default.go"></a>2.3.3 match.go/default.go</h3><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> search</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// defaultMatcher implements the default matcher.</span></span><br><span class="line"><span class="hljs-keyword">type</span> defaultMatcher <span class="hljs-keyword">struct</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// init registers the default matcher with the program.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-keyword">var</span> matcher defaultMatcher</span><br><span class="line">	Register(<span class="hljs-string">"default"</span>, matcher)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Search implements the behavior for the default matcher.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m defaultMatcher)</span> <span class="hljs-title">Search</span><span class="hljs-params">(feed *Feed, searchTerm <span class="hljs-keyword">string</span>)</span> <span class="hljs-params">([]*Result, error)</span></span> &#123;</span><br><span class="line">	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, <span class="hljs-literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>func (m defaultMatcher) Search 意味着search和defaultMatcher的值绑定在了一起，我们可以使用defaultMatcher 类型的值或者指向这个类型值的指针来调用Search 方<br>法。无论我们是使用接收者类型的值来调用这个方，还是使用接收者类型值的指针来调用这个<br>方法，编译器都会正确地引用或者解引用对应的值，作为接收者传递给Search 方法</p>
+<figure class="highlight hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// 方法声明为使用defaultMatcher 类型的值作为接收者</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m defaultMatcher)</span> <span class="hljs-title">Search</span><span class="hljs-params">(feed *Feed, searchTerm <span class="hljs-keyword">string</span>)</span></span></span><br><span class="line"><span class="hljs-function">// 声明一个指向<span class="hljs-title">defaultMatcher</span> 类型值的指针</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-title">dm</span> := <span class="hljs-title">new</span><span class="hljs-params">(defaultMatch)</span></span></span><br><span class="line"><span class="hljs-function">// 编译器会解开<span class="hljs-title">dm</span> 指针的引用，使用对应的值调用方法</span></span><br><span class="line">dm.Search(feed, "test")</span><br><span class="line"><span class="hljs-comment">// 方法声明为使用指向defaultMatcher 类型值的指针作为接收者</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *defaultMatcher)</span> <span class="hljs-title">Search</span><span class="hljs-params">(feed *Feed, searchTerm <span class="hljs-keyword">string</span>)</span></span></span><br><span class="line"><span class="hljs-function">// 声明一个<span class="hljs-title">defaultMatcher</span> 类型的值</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-title">var</span> <span class="hljs-title">dm</span> <span class="hljs-title">defaultMatch</span></span></span><br><span class="line"><span class="hljs-function">// 编译器会自动生成指针引用<span class="hljs-title">dm</span> 值，使用指针调用方法</span></span><br><span class="line">dm.Search(feed, "test")</span><br></pre></td></tr></table></figure>
+<p>与直接通过值或者指针调用方法不同，如果通过接口类型的值调用方法，规则有很大不同，<br>如代码清单2-38 所示。使用指针作为接收者声明的方法，只能在接口类型的值是一个指针的时<br>候被调用。使用值作为接收者声明的方法，在接口类型的值为值或者指针时，都可以被调用。<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// 方法声明为使用指向defaultMatcher 类型值的指针作为接收者</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *defaultMatcher)</span> <span class="hljs-title">Search</span><span class="hljs-params">(feed *Feed, searchTerm <span class="hljs-keyword">string</span>)</span></span></span><br><span class="line"><span class="hljs-function">// 通过<span class="hljs-title">interface</span> 类型的值来调用方法</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-title">var</span> <span class="hljs-title">dm</span> <span class="hljs-title">defaultMatcher</span></span></span><br><span class="line"><span class="hljs-function"><span class="hljs-title">var</span> <span class="hljs-title">matcher</span> <span class="hljs-title">Matcher</span> = <span class="hljs-title">dm</span> // 将值赋值给接口类型</span></span><br><span class="line">matcher.Search(feed, "test") // 使用值来调用接口方法</span><br><span class="line">&gt; <span class="hljs-keyword">go</span> build</span><br><span class="line">cannot use dm (<span class="hljs-keyword">type</span> defaultMatcher) as <span class="hljs-keyword">type</span> Matcher in assignment</span><br><span class="line"><span class="hljs-comment">// 方法声明为使用defaultMatcher 类型的值作为接收者</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m defaultMatcher)</span> <span class="hljs-title">Search</span><span class="hljs-params">(feed *Feed, searchTerm <span class="hljs-keyword">string</span>)</span></span></span><br><span class="line"><span class="hljs-function">// 通过<span class="hljs-title">interface</span> 类型的值来调用方法</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-title">var</span> <span class="hljs-title">dm</span> <span class="hljs-title">defaultMatcher</span></span></span><br><span class="line"><span class="hljs-function"><span class="hljs-title">var</span> <span class="hljs-title">matcher</span> <span class="hljs-title">Matcher</span> = &amp;<span class="hljs-title">dm</span> // 将指针赋值给接口类型</span></span><br><span class="line">matcher.Search(feed, "test") // 使用指针来调用接口方法</span><br><span class="line">&gt; <span class="hljs-keyword">go</span> build</span><br><span class="line">Build Successful</span><br></pre></td></tr></table></figure></p>
+<p>match创建不同类型的匹配器，Matcher其实是一个接口，对于每种匹配器又有不同的具体实现。<br>下面的代码中，Matcher接口定义了一个Search方法，每个实现了Search方法的类型都实现了Matcher接口</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> search</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"log"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Result contains the result of a search.</span></span><br><span class="line"><span class="hljs-keyword">type</span> Result <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	Field   <span class="hljs-keyword">string</span></span><br><span class="line">	Content <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Matcher defines the behavior required by types that want</span></span><br><span class="line"><span class="hljs-comment">// to implement a new search type.</span></span><br><span class="line"><span class="hljs-keyword">type</span> Matcher <span class="hljs-keyword">interface</span> &#123;</span><br><span class="line">	Search(feed *Feed, searchTerm <span class="hljs-keyword">string</span>) ([]*Result, error)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Match is launched as a goroutine for each individual feed to run</span></span><br><span class="line"><span class="hljs-comment">// searches concurrently.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Match</span><span class="hljs-params">(matcher Matcher, feed *Feed, searchTerm <span class="hljs-keyword">string</span>, results <span class="hljs-keyword">chan</span>&lt;- *Result)</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Perform the search against the specified matcher.</span></span><br><span class="line">	searchResults, err := matcher.Search(feed, searchTerm)</span><br><span class="line">	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;</span><br><span class="line">		log.Println(err)</span><br><span class="line">		<span class="hljs-keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Write the results to the channel.</span></span><br><span class="line">	<span class="hljs-keyword">for</span> _, result := <span class="hljs-keyword">range</span> searchResults &#123;</span><br><span class="line">		results &lt;- result</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Display writes results to the console window as they</span></span><br><span class="line"><span class="hljs-comment">// are received by the individual goroutines.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Display</span><span class="hljs-params">(results <span class="hljs-keyword">chan</span> *Result)</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// The channel blocks until a result is written to the channel.</span></span><br><span class="line">	<span class="hljs-comment">// Once the channel is closed the for loop terminates.</span></span><br><span class="line">	<span class="hljs-keyword">for</span> result := <span class="hljs-keyword">range</span> results &#123;</span><br><span class="line">		log.Printf(<span class="hljs-string">"%s:\n%s\n\n"</span>, result.Field, result.Content)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Display方法会迭代results这个channel，有数据时会打印，没数据时会阻塞，当main.go中的close(result)后，for range循环结束</p>
+<p>注意到default.go有init函数，这个函数会在main中通过下划线导入包的时候执行，init的功能是初始化匹配器</p>
+<h2 id="2-4-RSS-匹配器"><a href="#2-4-RSS-匹配器" class="headerlink" title="2.4 RSS 匹配器"></a>2.4 RSS 匹配器</h2><h2 id="2-5-小结"><a href="#2-5-小结" class="headerlink" title="2.5 小结"></a>2.5 小结</h2><ul>
+<li>每个代码文件都属于一个包，而包名应该与代码文件所在的文件夹同名。</li>
+<li>Go 语言提供了多种声明和初始化变量的方式。如果变量的值没有显式初始化，编译器会将变量初始化为零值。</li>
+<li>使用指针可以在函数间或者goroutine 间共享数据。</li>
+<li>通过启动goroutine 和使用通道完成并发和同步。</li>
+<li>Go 语言提供了内置函数来支持Go 语言内部的数据结构。</li>
+<li>标准库包含很多包，能做很多很有用的事情。</li>
+<li>使用Go 接口可以编写通用的代码和框架。</li>
+</ul>
+
+        </div>
+        
+        
+        
+    </div>
+</div>
+
+
+
+
+
+
+
+
+    <div class="card">
+    
+    <div class="card-image">
         <a href="/2019/04/11/go_intro/" class="image is-7by1">
             <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-关于go语言的介绍">
         </a>
@@ -209,7 +302,7 @@
                 <time class="level-item has-text-grey" datetime="2019-03-22T08:49:15.000Z">2019-03-22</time>
                 
                 <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/Python/">Python</a>&nbsp;/&nbsp;<a class="has-link-grey -link" href="/categories/Python/Go/">Go</a>
+                <a class="has-link-grey -link" href="/categories/Python/">Python</a>
                 </div>
                 
                 
@@ -555,7 +648,7 @@
                         Posts
                     </p>
                     <p class="title has-text-weight-normal">
-                        5
+                        6
                     </p>
                 </div>
             </div>
@@ -565,7 +658,7 @@
                         Categories
                     </p>
                     <p class="title has-text-weight-normal">
-                        4
+                        3
                     </p>
                 </div>
             </div>
@@ -678,7 +771,7 @@
                 <span class="level-item">Go In Action</span>
             </span>
             <span class="level-end">
-                <span class="level-item tag">1</span>
+                <span class="level-item tag">2</span>
             </span>
         </a></li><li>
         <a class="level is-marginless" href="/categories/Python/">
@@ -688,15 +781,7 @@
             <span class="level-end">
                 <span class="level-item tag">2</span>
             </span>
-        </a><ul><li>
-        <a class="level is-marginless" href="/categories/Python/Go/">
-            <span class="level-start">
-                <span class="level-item">Go</span>
-            </span>
-            <span class="level-end">
-                <span class="level-item tag">1</span>
-            </span>
-        </a></li></ul></li><li>
+        </a></li><li>
         <a class="level is-marginless" href="/categories/java/">
             <span class="level-start">
                 <span class="level-item">java</span>
@@ -716,7 +801,7 @@
         <h3 class="menu-label">
             Tag Cloud
         </h3>
-        <a href="/tags/Golang/" style="font-size: 10px;">Golang</a> <a href="/tags/单例模式/" style="font-size: 10px;">单例模式</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/生产者消费者模型/" style="font-size: 10px;">生产者消费者模型</a> <a href="/tags/线程安全/" style="font-size: 10px;">线程安全</a> <a href="/tags/装饰器/" style="font-size: 10px;">装饰器</a> <a href="/tags/闭包/" style="font-size: 10px;">闭包</a>
+        <a href="/tags/Golang/" style="font-size: 20px;">Golang</a> <a href="/tags/单例模式/" style="font-size: 10px;">单例模式</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/生产者消费者模型/" style="font-size: 10px;">生产者消费者模型</a> <a href="/tags/线程安全/" style="font-size: 10px;">线程安全</a> <a href="/tags/装饰器/" style="font-size: 10px;">装饰器</a> <a href="/tags/闭包/" style="font-size: 10px;">闭包</a>
     </div>
 </div>
 
@@ -730,6 +815,25 @@
         <h3 class="menu-label">
             Recent
         </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/04/11/go_quick_prog/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-快速开始一个GO程序">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time></div>
+                    <a href="/2019/04/11/go_quick_prog/" class="has-link-black-ter is-size-6">GIA-Ch1-快速开始一个GO程序</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
         
         <article class="media">
             
@@ -763,7 +867,7 @@
                     <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-03-22T08:49:15.000Z">2019-03-22</time></div>
                     <a href="/2019/03/22/decorator_2/" class="has-link-black-ter is-size-6">Python闭包和go闭包</a>
                     <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/Python/">Python</a> / <a class="has-link-grey -link" href="/categories/Python/Go/">Go</a>
+                        <a class="has-link-grey -link" href="/categories/Python/">Python</a>
                     </p>
                 </div>
             </div>
@@ -807,25 +911,6 @@
             </div>
         </article>
         
-        <article class="media">
-            
-            <a href="/2017/12/04/proandconsu/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/consumer_producer.jpg" alt="生产者和消费者模型初探">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-04T11:25:11.000Z">2017-12-04</time></div>
-                    <a href="/2017/12/04/proandconsu/" class="has-link-black-ter is-size-6">生产者和消费者模型初探</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/java/">java</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
     </div>
 </div>
 
@@ -844,7 +929,7 @@
                     <span class="level-item">April 2019</span>
                 </span>
                 <span class="level-end">
-                    <span class="level-item tag">1</span>
+                    <span class="level-item tag">2</span>
                 </span>
             </a>
         </li>
@@ -887,7 +972,7 @@
                 <div class="control">
                     <a class="tags has-addons" href="/tags/Golang/">
                         <span class="tag">Golang</span>
-                        <span class="tag is-grey">1</span>
+                        <span class="tag is-grey">2</span>
                     </a>
                 </div>
                 
@@ -958,6 +1043,25 @@
         
         <article class="media">
             
+            <a href="/2019/04/11/go_quick_prog/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-快速开始一个GO程序">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time></div>
+                    <a href="/2019/04/11/go_quick_prog/" class="has-link-black-ter is-size-6">GIA-Ch1-快速开始一个GO程序</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
             <a href="/2019/04/11/go_intro/" class="media-left">
                 <p class="image is-64x64">
                     <img class="thumbnail" src="/css/images/golang.png" alt="GIA-Ch1-关于go语言的介绍">
@@ -988,7 +1092,7 @@
                     <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-03-22T08:49:15.000Z">2019-03-22</time></div>
                     <a href="/2019/03/22/decorator_2/" class="has-link-black-ter is-size-6">Python闭包和go闭包</a>
                     <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/Python/">Python</a> / <a class="has-link-grey -link" href="/categories/Python/Go/">Go</a>
+                        <a class="has-link-grey -link" href="/categories/Python/">Python</a>
                     </p>
                 </div>
             </div>
@@ -1032,25 +1136,6 @@
             </div>
         </article>
         
-        <article class="media">
-            
-            <a href="/2017/12/04/proandconsu/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/consumer_producer.jpg" alt="生产者和消费者模型初探">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-04T11:25:11.000Z">2017-12-04</time></div>
-                    <a href="/2017/12/04/proandconsu/" class="has-link-black-ter is-size-6">生产者和消费者模型初探</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/java/">java</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
     </div>
 </div>
 
@@ -1069,7 +1154,7 @@
                     <span class="level-item">April 2019</span>
                 </span>
                 <span class="level-end">
-                    <span class="level-item tag">1</span>
+                    <span class="level-item tag">2</span>
                 </span>
             </a>
         </li>
@@ -1112,7 +1197,7 @@
                 <div class="control">
                     <a class="tags has-addons" href="/tags/Golang/">
                         <span class="tag">Golang</span>
-                        <span class="tag is-grey">1</span>
+                        <span class="tag is-grey">2</span>
                     </a>
                 </div>
                 
