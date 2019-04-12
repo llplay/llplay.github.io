@@ -2,26 +2,26 @@
 <html lang="en">
 <head><meta name="generator" content="Hexo 3.8.0">
     <meta charset="utf-8">
-<title>Python闭包和go闭包 - duoduo</title>
+<title>打包和工具链-《Go In Action》-Ch3 - duoduo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
 
     
-    <meta name="description" content="最近学习golang，发现golang里面也有闭包的概念，这里和python比较一下，并有些新的体会，记下来 1.Python 闭包闭包：引用了自由变量的函数，从下面这个例子看出，decorator的返回值_wrap引用了两个自由变量f和cache通过closure可以一探究竟，输出结果可以看出closure包含两个元素，一个是function，另外一个是cache， 12345678910111">
-<meta name="keywords" content="闭包">
+    <meta name="description" content="3.1 包对于所有的.go文件，都应该在首行声明自己所属的包，每个包在一个单独的目录中，不能把多个包放在一个目录中，也不能把相同的包拆分到不同的目，同一个包下的所有.go文件必须声明同一个包名 包命名惯例，简洁，顾名思义 main包是特殊的包，编译程序会将带有main包声明的包编译为二进制可执行文件，main包中一定要有main函数，否则不可以创建可执行文件 3.2 导入导入包查找顺序 GOROO">
+<meta name="keywords" content="Golang">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Python闭包和go闭包">
-<meta property="og:url" content="http://llplay.github.io/2019/03/22/decorator_2/index.html">
+<meta property="og:title" content="打包和工具链-《Go In Action》-Ch3">
+<meta property="og:url" content="http://llplay.github.io/2019/04/12/go_pack_tool/index.html">
 <meta property="og:site_name" content="duoduo">
-<meta property="og:description" content="最近学习golang，发现golang里面也有闭包的概念，这里和python比较一下，并有些新的体会，记下来 1.Python 闭包闭包：引用了自由变量的函数，从下面这个例子看出，decorator的返回值_wrap引用了两个自由变量f和cache通过closure可以一探究竟，输出结果可以看出closure包含两个元素，一个是function，另外一个是cache， 12345678910111">
+<meta property="og:description" content="3.1 包对于所有的.go文件，都应该在首行声明自己所属的包，每个包在一个单独的目录中，不能把多个包放在一个目录中，也不能把相同的包拆分到不同的目，同一个包下的所有.go文件必须声明同一个包名 包命名惯例，简洁，顾名思义 main包是特殊的包，编译程序会将带有main包声明的包编译为二进制可执行文件，main包中一定要有main函数，否则不可以创建可执行文件 3.2 导入导入包查找顺序 GOROO">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="http://llplay.github.io/css/images/closure.jpg">
-<meta property="og:updated_time" content="2019-04-11T03:32:45.458Z">
+<meta property="og:image" content="http://llplay.github.io/css/images/golang.png">
+<meta property="og:updated_time" content="2019-04-12T02:48:39.502Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Python闭包和go闭包">
-<meta name="twitter:description" content="最近学习golang，发现golang里面也有闭包的概念，这里和python比较一下，并有些新的体会，记下来 1.Python 闭包闭包：引用了自由变量的函数，从下面这个例子看出，decorator的返回值_wrap引用了两个自由变量f和cache通过closure可以一探究竟，输出结果可以看出closure包含两个元素，一个是function，另外一个是cache， 12345678910111">
-<meta name="twitter:image" content="http://llplay.github.io/css/images/closure.jpg">
+<meta name="twitter:title" content="打包和工具链-《Go In Action》-Ch3">
+<meta name="twitter:description" content="3.1 包对于所有的.go文件，都应该在首行声明自己所属的包，每个包在一个单独的目录中，不能把多个包放在一个目录中，也不能把相同的包拆分到不同的目，同一个包下的所有.go文件必须声明同一个包名 包命名惯例，简洁，顾名思义 main包是特殊的包，编译程序会将带有main包声明的包编译为二进制可执行文件，main包中一定要有main函数，否则不可以创建可执行文件 3.2 导入导入包查找顺序 GOROO">
+<meta name="twitter:image" content="http://llplay.github.io/css/images/golang.png">
 
 
 
@@ -95,7 +95,7 @@
         <div class="navbar-brand is-flex-center">
             <a class="navbar-item navbar-logo" href="/">
             
-                <img src="/images/logo.svg" alt="Python闭包和go闭包" height="28">
+                <img src="/images/logo.svg" alt="打包和工具链-《Go In Action》-Ch3" height="28">
             
             </a>
         </div>
@@ -144,7 +144,7 @@
     
     <div class="card-image">
         <span class="image is-7by1">
-            <img class="thumbnail" src="/css/images/closure.jpg" alt="Python闭包和go闭包">
+            <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
         </span>
     </div>
     
@@ -152,17 +152,17 @@
         
         <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
             <div class="level-left">
-                <time class="level-item has-text-grey" datetime="2019-03-22T08:49:15.000Z">2019-03-22</time>
+                <time class="level-item has-text-grey" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time>
                 
                 <div class="level-item">
-                <a class="has-link-grey -link" href="/categories/Python/">Python</a>
+                <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
                 </div>
                 
                 
                 <span class="level-item has-text-grey">
                     
                     
-                    3 minutes read (About 413 words)
+                    6 minutes read (About 901 words)
                 </span>
                 
                 
@@ -171,19 +171,26 @@
         
         <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
             
-                Python闭包和go闭包
+                打包和工具链-《Go In Action》-Ch3
             
         </h1>
         <div class="content">
-            <p>最近学习golang，发现golang里面也有闭包的概念，这里和python比较一下，并有些新的体会，记下来</p>
-<h1 id="1-Python-闭包"><a href="#1-Python-闭包" class="headerlink" title="1.Python 闭包"></a>1.Python 闭包</h1><p>闭包：引用了自由变量的函数，从下面这个例子看出，decorator的返回值_wrap引用了两个自由变量f和cache<br>通过<strong>closure</strong>可以一探究竟，输出结果可以看出<strong>closure</strong>包含两个元素，一个是function，另外一个是cache，</p>
-<figure class="highlight python hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">decorator</span><span class="hljs-params">(f)</span>:</span></span><br><span class="line">    cache = []</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_wrap</span><span class="hljs-params">(*args, **kwargs)</span>:</span></span><br><span class="line">        cache.append(<span class="hljs-number">1</span>)</span><br><span class="line">        print(cache)</span><br><span class="line">        f(*args, **kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">return</span> _wrap</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment"># @decorator</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span>:</span></span><br><span class="line">    print(<span class="hljs-string">"foo"</span>)</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">"__main__"</span>: </span><br><span class="line"></span><br><span class="line">    a = decorator(foo)</span><br><span class="line">    a()</span><br><span class="line">    print(a.__closure__)</span><br><span class="line">    print(a.__closure__[<span class="hljs-number">1</span>].cell_contents)</span><br><span class="line">    print(a.__closure__[<span class="hljs-number">0</span>].cell_contents)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment"># output</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">#foo</span></span><br><span class="line"><span class="hljs-comment">#(&lt;cell at 0x1094cd198: list object at 0x10acea248&gt;, &lt;cell at 0x1094cd4c8: function object at 0x107879268&gt;)</span></span><br><span class="line"><span class="hljs-comment">#&lt;function foo at 0x107879268&gt;</span></span><br><span class="line"><span class="hljs-comment">#[1]</span></span><br></pre></td></tr></table></figure>
-<p>之前写过一篇对于闭包中引用变量的生命周期，这次做了个实验，先看结果</p>
-<figure class="highlight python hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">decorator</span><span class="hljs-params">(f)</span>:</span></span><br><span class="line">    cache = []</span><br><span class="line"></span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">_wrap</span><span class="hljs-params">(*args, **kwargs)</span>:</span></span><br><span class="line">        cache.append(<span class="hljs-number">1</span>)</span><br><span class="line">        print(cache)</span><br><span class="line">        f(*args, **kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="hljs-keyword">return</span> _wrap</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="hljs-comment"># @decorator</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span>:</span></span><br><span class="line">    print(<span class="hljs-string">"foo"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">"__main__"</span>:</span><br><span class="line">    a = decorator(foo)</span><br><span class="line">    a()</span><br><span class="line">    a()</span><br><span class="line">    print(a.__closure__)</span><br><span class="line">    print(a.__closure__[<span class="hljs-number">1</span>].cell_contents)</span><br><span class="line">    print(a.__closure__[<span class="hljs-number">0</span>].cell_contents)</span><br><span class="line"></span><br><span class="line">    b = decorator(foo)</span><br><span class="line">    b()</span><br><span class="line">    b()</span><br><span class="line">    print(b.__closure__)</span><br><span class="line">    print(b.__closure__[<span class="hljs-number">1</span>].cell_contents)</span><br><span class="line">    print(b.__closure__[<span class="hljs-number">0</span>].cell_contents)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment"># output</span></span><br><span class="line"><span class="hljs-comment"># [1]</span></span><br><span class="line"><span class="hljs-comment"># foo</span></span><br><span class="line"><span class="hljs-comment"># [1, 1]</span></span><br><span class="line"><span class="hljs-comment"># foo</span></span><br><span class="line"><span class="hljs-comment"># (&lt;cell at 0x10eb34198: list object at 0x11a657248&gt;, &lt;cell at 0x10eb344c8: function object at 0x10cee0268&gt;)</span></span><br><span class="line"><span class="hljs-comment"># &lt;function foo at 0x10cee0268&gt;</span></span><br><span class="line"><span class="hljs-comment"># [1, 1]</span></span><br><span class="line"><span class="hljs-comment"># [1]</span></span><br><span class="line"><span class="hljs-comment"># foo</span></span><br><span class="line"><span class="hljs-comment"># [1, 1]</span></span><br><span class="line"><span class="hljs-comment"># foo</span></span><br><span class="line"><span class="hljs-comment"># (&lt;cell at 0x10eb34a98: list object at 0x112abb188&gt;, &lt;cell at 0x10eb34af8: function object at 0x10cee0268&gt;)</span></span><br><span class="line"><span class="hljs-comment"># &lt;function foo at 0x10cee0268&gt;</span></span><br><span class="line"><span class="hljs-comment"># [1, 1]</span></span><br></pre></td></tr></table></figure>
-<p>可以看到闭包的自由变量的作用域对于每个函数是独立的，即a和b对于f和cache的引用是独立的</p>
-<h1 id="2-Go闭包"><a href="#2-Go闭包" class="headerlink" title="2.Go闭包"></a>2.Go闭包</h1><p>go的闭包和python基本一样，看个例子</p>
-<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> <span class="hljs-string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">decorator</span><span class="hljs-params">(f <span class="hljs-keyword">func</span>()</span>) <span class="hljs-title">func</span><span class="hljs-params">()</span></span>&#123;</span><br><span class="line">    <span class="hljs-keyword">var</span> cache []<span class="hljs-keyword">string</span></span><br><span class="line">    cache = <span class="hljs-built_in">append</span>(cache, <span class="hljs-string">"1"</span>)</span><br><span class="line">    _wrap := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">        cache = <span class="hljs-built_in">append</span>(cache, <span class="hljs-string">"foo"</span>)</span><br><span class="line">        fmt.Printf(<span class="hljs-string">"%s\n"</span>, cache)</span><br><span class="line">        f()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-keyword">return</span> _wrap</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="hljs-string">"foo"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">  a := decorator(foo)</span><br><span class="line">  a()</span><br><span class="line">  a()</span><br><span class="line">  b := decorator(foo)</span><br><span class="line">  b()</span><br><span class="line">  b()</span><br><span class="line">&#125;</span><br><span class="line"><span class="hljs-comment">// output</span></span><br><span class="line"><span class="hljs-comment">// [1 foo]</span></span><br><span class="line"><span class="hljs-comment">// foo</span></span><br><span class="line"><span class="hljs-comment">// [1 foo foo]</span></span><br><span class="line"><span class="hljs-comment">// foo</span></span><br><span class="line"><span class="hljs-comment">// [1 foo]</span></span><br><span class="line"><span class="hljs-comment">// foo</span></span><br><span class="line"><span class="hljs-comment">// [1 foo foo]</span></span><br><span class="line"><span class="hljs-comment">//foo</span></span><br></pre></td></tr></table></figure>
-<p>可以看到对于a和b对于自用变量的引用也是独立的，互不影响</p>
+            <h2 id="3-1-包"><a href="#3-1-包" class="headerlink" title="3.1 包"></a>3.1 包</h2><p>对于所有的.go文件，都应该在首行声明自己所属的包，每个包在一个单独的目录中，不能把多个包放在一个目录中，也不能把相同的包拆分到不同的目，同一个包下的所有<br>.go文件必须声明同一个包名</p>
+<p>包命名惯例，简洁，顾名思义</p>
+<p>main包是特殊的包，编译程序会将带有main包声明的包编译为二进制可执行文件，main包中一定要有main函数，否则不可以创建可执行文件</p>
+<h2 id="3-2-导入"><a href="#3-2-导入" class="headerlink" title="3.2 导入"></a>3.2 导入</h2><p>导入包查找顺序 GOROOT -》 GOPATH，一旦编译器找到一个满足的包就会停止查找，也可以远程导入包，通过go get 将GitHub的包下载到本地</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">	<span class="hljs-string">"strings"</span></span><br><span class="line">	<span class="hljs-string">"github.com/spf13/viper"</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>如果包重名，可以使用命名导入，将导入的包命名为新名字</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">	myfmt <span class="hljs-string">"mylib/fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="hljs-string">"Standard Library"</span>)</span><br><span class="line">	myfmt.Println(<span class="hljs-string">"mylib/fmt"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果导入了不在代码使用的包，会导致编译失败，可以使用下划线来重命名不适用的包</p>
+<h2 id="3-3-函数init"><a href="#3-3-函数init" class="headerlink" title="3.3 函数init"></a>3.3 函数init</h2><p>每个包可以包含任意多个init函数，在main之前被调用，init函数用在设置包、初始化变量或者其他要在程序运行前优先完成的引导工作，可以使用下划线来重命名不适用的包<br>以数据库驱动为例，sql包在编译时并不知道要注册哪些驱动，如果我们要使用数据库连接，就需要用init函数将驱动注册到mysql上</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> postgres</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"database/sql"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	sql.Register(<span class="hljs-string">"postgres"</span>, <span class="hljs-built_in">new</span>(PostgresDriver))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在使用这个新的数据库驱动时，需要使用空白标识符导入包<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line"><span class="hljs-string">"database/sql"</span></span><br><span class="line">_ <span class="hljs-string">"github.com/goinaction/code/chapter3/dbdriver/postgres"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">sql.Open(<span class="hljs-string">"postgres"</span>, <span class="hljs-string">"mydb"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-4-使用Go的工具"><a href="#3-4-使用Go的工具" class="headerlink" title="3.4 使用Go的工具"></a>3.4 使用Go的工具</h2><p>go build 执行编译<br>参数为空时 默认编译当前目录<br>参数可以为文件名<br>参数可以为/… 会编译目录下的所有包</p>
+<p>go clean 执行清理，会删除可执行文件<br>go run 先构建再执行</p>
+<h2 id="3-5-进一步介绍Go开发工具"><a href="#3-5-进一步介绍Go开发工具" class="headerlink" title="3.5 进一步介绍Go开发工具"></a>3.5 进一步介绍Go开发工具</h2><p>go vet 检测代码常见错误 printf类型匹配错误参数 方法签名错误 错误的结构标签 没有指定字段名的结构字面量<br>go fmt 格式化代码<br>go doc 打印文档<br>godoc 浏览器打开文档 godoc -http:6000</p>
+<h2 id="3-7-依赖管理"><a href="#3-7-依赖管理" class="headerlink" title="3.7 依赖管理"></a>3.7 依赖管理</h2><p>没有实际管理过一个大工程，这里看的稀里糊涂的，暂时不表了，等搞清楚再补</p>
+<h2 id="3-8-小结"><a href="#3-8-小结" class="headerlink" title="3.8 小结"></a>3.8 小结</h2><p>Go语言中包是组织代码的基本单位<br>环境变量GOPATH决定了GO源代码在磁盘上被保存、编译和安装的位置<br>可以为每个工程设置不同的GOPATH，以保持源代码和依赖的隔离<br>go工具是在命令行上工作的最好工具<br>开发人员可以使用go get获取别人的包并将其安装到自己的GOPATH指定的目录<br>想要为别人创建包很见到，只要把源代码放到共有代码库，把那个遵守一些简单的规则就可以了<br>GO语言在设计时将分享代码作为语言的核心特性和驱动力<br>推荐使用依赖管理工具来管理依赖<br>有很多社区开发的依赖管理工具，godep、vendor、gb</p>
 
         </div>
         
@@ -191,7 +198,7 @@
             <div class="level-start">
                 <div class="level-item">
                     <span class="is-size-6 has-text-grey has-mr-7">#</span>
-                    <a class="has-link-grey -link" href="/tags/闭包/">闭包</a>
+                    <a class="has-link-grey -link" href="/tags/Golang/">Golang</a>
                 </div>
             </div>
         </div>
@@ -208,17 +215,10 @@
 <div class="card card-transparent">
     <div class="level post-navigation is-flex-wrap is-mobile">
         
-        <div class="level-start">
-            <a class="level level-item has-link-grey  article-nav-prev" href="/2019/04/11/go_quick_prog/">
-                <i class="level-item fas fa-chevron-left"></i>
-                <span class="level-item">快速开始一个GO程序-《Go In Action》-Ch2</span>
-            </a>
-        </div>
-        
         
         <div class="level-end">
-            <a class="level level-item has-link-grey  article-nav-next" href="/2017/12/05/decorator/">
-                <span class="level-item">Python中的装饰器</span>
+            <a class="level level-item has-link-grey  article-nav-next" href="/2019/04/11/go_intro/">
+                <span class="level-item">关于go语言的介绍-《Go In Action》-Ch1</span>
                 <i class="level-item fas fa-chevron-right"></i>
             </a>
         </div>
@@ -234,8 +234,8 @@
         
 <script>
     var disqus_config = function () {
-        this.page.url = 'http://llplay.github.io/2019/03/22/decorator_2/';
-        this.page.identifier = '2019/03/22/decorator_2/';
+        this.page.url = 'http://llplay.github.io/2019/04/12/go_pack_tool/';
+        this.page.identifier = '2019/04/12/go_pack_tool/';
     };
     (function() {
         var d = document, s = d.createElement('script');  
@@ -906,7 +906,7 @@
             <div class="level-start has-text-centered-mobile">
                 <a class="footer-logo is-block has-mb-6" href="/">
                 
-                    <img src="/images/logo.svg" alt="Python闭包和go闭包" height="28">
+                    <img src="/images/logo.svg" alt="打包和工具链-《Go In Action》-Ch3" height="28">
                 
                 </a>
                 <p class="is-size-7">

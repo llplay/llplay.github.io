@@ -137,6 +137,72 @@
     <div class="card">
     
     <div class="card-image">
+        <a href="/2019/04/12/go_pack_tool/" class="image is-7by1">
+            <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
+        </a>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    6 minutes read (About 901 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                <a class="has-link-black-ter" href="/2019/04/12/go_pack_tool/">打包和工具链-《Go In Action》-Ch3</a>
+            
+        </h1>
+        <div class="content">
+            <h2 id="3-1-包"><a href="#3-1-包" class="headerlink" title="3.1 包"></a>3.1 包</h2><p>对于所有的.go文件，都应该在首行声明自己所属的包，每个包在一个单独的目录中，不能把多个包放在一个目录中，也不能把相同的包拆分到不同的目，同一个包下的所有<br>.go文件必须声明同一个包名</p>
+<p>包命名惯例，简洁，顾名思义</p>
+<p>main包是特殊的包，编译程序会将带有main包声明的包编译为二进制可执行文件，main包中一定要有main函数，否则不可以创建可执行文件</p>
+<h2 id="3-2-导入"><a href="#3-2-导入" class="headerlink" title="3.2 导入"></a>3.2 导入</h2><p>导入包查找顺序 GOROOT -》 GOPATH，一旦编译器找到一个满足的包就会停止查找，也可以远程导入包，通过go get 将GitHub的包下载到本地</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">	<span class="hljs-string">"strings"</span></span><br><span class="line">	<span class="hljs-string">"github.com/spf13/viper"</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>如果包重名，可以使用命名导入，将导入的包命名为新名字</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">	myfmt <span class="hljs-string">"mylib/fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="hljs-string">"Standard Library"</span>)</span><br><span class="line">	myfmt.Println(<span class="hljs-string">"mylib/fmt"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果导入了不在代码使用的包，会导致编译失败，可以使用下划线来重命名不适用的包</p>
+<h2 id="3-3-函数init"><a href="#3-3-函数init" class="headerlink" title="3.3 函数init"></a>3.3 函数init</h2><p>每个包可以包含任意多个init函数，在main之前被调用，init函数用在设置包、初始化变量或者其他要在程序运行前优先完成的引导工作，可以使用下划线来重命名不适用的包<br>以数据库驱动为例，sql包在编译时并不知道要注册哪些驱动，如果我们要使用数据库连接，就需要用init函数将驱动注册到mysql上</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> postgres</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"database/sql"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	sql.Register(<span class="hljs-string">"postgres"</span>, <span class="hljs-built_in">new</span>(PostgresDriver))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在使用这个新的数据库驱动时，需要使用空白标识符导入包<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line"><span class="hljs-string">"database/sql"</span></span><br><span class="line">_ <span class="hljs-string">"github.com/goinaction/code/chapter3/dbdriver/postgres"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">sql.Open(<span class="hljs-string">"postgres"</span>, <span class="hljs-string">"mydb"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-4-使用Go的工具"><a href="#3-4-使用Go的工具" class="headerlink" title="3.4 使用Go的工具"></a>3.4 使用Go的工具</h2><p>go build 执行编译<br>参数为空时 默认编译当前目录<br>参数可以为文件名<br>参数可以为/… 会编译目录下的所有包</p>
+<p>go clean 执行清理，会删除可执行文件<br>go run 先构建再执行</p>
+<h2 id="3-5-进一步介绍Go开发工具"><a href="#3-5-进一步介绍Go开发工具" class="headerlink" title="3.5 进一步介绍Go开发工具"></a>3.5 进一步介绍Go开发工具</h2><p>go vet 检测代码常见错误 printf类型匹配错误参数 方法签名错误 错误的结构标签 没有指定字段名的结构字面量<br>go fmt 格式化代码<br>go doc 打印文档<br>godoc 浏览器打开文档 godoc -http:6000</p>
+<h2 id="3-7-依赖管理"><a href="#3-7-依赖管理" class="headerlink" title="3.7 依赖管理"></a>3.7 依赖管理</h2><p>没有实际管理过一个大工程，这里看的稀里糊涂的，暂时不表了，等搞清楚再补</p>
+<h2 id="3-8-小结"><a href="#3-8-小结" class="headerlink" title="3.8 小结"></a>3.8 小结</h2><p>Go语言中包是组织代码的基本单位<br>环境变量GOPATH决定了GO源代码在磁盘上被保存、编译和安装的位置<br>可以为每个工程设置不同的GOPATH，以保持源代码和依赖的隔离<br>go工具是在命令行上工作的最好工具<br>开发人员可以使用go get获取别人的包并将其安装到自己的GOPATH指定的目录<br>想要为别人创建包很见到，只要把源代码放到共有代码库，把那个遵守一些简单的规则就可以了<br>GO语言在设计时将分享代码作为语言的核心特性和驱动力<br>推荐使用依赖管理工具来管理依赖<br>有很多社区开发的依赖管理工具，godep、vendor、gb</p>
+
+        </div>
+        
+        
+        
+    </div>
+</div>
+
+
+
+
+
+
+
+
+    <div class="card">
+    
+    <div class="card-image">
         <a href="/2019/04/11/go_intro/" class="image is-7by1">
             <img class="thumbnail" src="/css/images/golang.png" alt="关于go语言的介绍-《Go In Action》-Ch1">
         </a>
@@ -216,7 +282,7 @@
                 <span class="level-item has-text-grey">
                     
                     
-                    17 minutes read (About 2562 words)
+                    18 minutes read (About 2674 words)
                 </span>
                 
                 
@@ -263,7 +329,9 @@
 <figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> search</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"log"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Result contains the result of a search.</span></span><br><span class="line"><span class="hljs-keyword">type</span> Result <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	Field   <span class="hljs-keyword">string</span></span><br><span class="line">	Content <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Matcher defines the behavior required by types that want</span></span><br><span class="line"><span class="hljs-comment">// to implement a new search type.</span></span><br><span class="line"><span class="hljs-keyword">type</span> Matcher <span class="hljs-keyword">interface</span> &#123;</span><br><span class="line">	Search(feed *Feed, searchTerm <span class="hljs-keyword">string</span>) ([]*Result, error)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Match is launched as a goroutine for each individual feed to run</span></span><br><span class="line"><span class="hljs-comment">// searches concurrently.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Match</span><span class="hljs-params">(matcher Matcher, feed *Feed, searchTerm <span class="hljs-keyword">string</span>, results <span class="hljs-keyword">chan</span>&lt;- *Result)</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Perform the search against the specified matcher.</span></span><br><span class="line">	searchResults, err := matcher.Search(feed, searchTerm)</span><br><span class="line">	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;</span><br><span class="line">		log.Println(err)</span><br><span class="line">		<span class="hljs-keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Write the results to the channel.</span></span><br><span class="line">	<span class="hljs-keyword">for</span> _, result := <span class="hljs-keyword">range</span> searchResults &#123;</span><br><span class="line">		results &lt;- result</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Display writes results to the console window as they</span></span><br><span class="line"><span class="hljs-comment">// are received by the individual goroutines.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Display</span><span class="hljs-params">(results <span class="hljs-keyword">chan</span> *Result)</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// The channel blocks until a result is written to the channel.</span></span><br><span class="line">	<span class="hljs-comment">// Once the channel is closed the for loop terminates.</span></span><br><span class="line">	<span class="hljs-keyword">for</span> result := <span class="hljs-keyword">range</span> results &#123;</span><br><span class="line">		log.Printf(<span class="hljs-string">"%s:\n%s\n\n"</span>, result.Field, result.Content)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>Display方法会迭代results这个channel，有数据时会打印，没数据时会阻塞，当main.go中的close(result)后，for range循环结束</p>
 <p>注意到default.go有init函数，这个函数会在main中通过下划线导入包的时候执行，init的功能是初始化匹配器</p>
-<h2 id="2-4-RSS-匹配器"><a href="#2-4-RSS-匹配器" class="headerlink" title="2.4 RSS 匹配器"></a>2.4 RSS 匹配器</h2><h2 id="2-5-小结"><a href="#2-5-小结" class="headerlink" title="2.5 小结"></a>2.5 小结</h2><ul>
+<h2 id="2-4-RSS-匹配器"><a href="#2-4-RSS-匹配器" class="headerlink" title="2.4 RSS 匹配器"></a>2.4 RSS 匹配器</h2><p>rss.go篇幅过长，这里不贴代码了，其中有几个关注的点说下：<br>在init中注册了一个rssMatcher，这个match和之前的defaultMatcher一样，绑定了Search方法，即实现了Matcher接口<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-keyword">var</span> matcher rssMatcher</span><br><span class="line">	search.Register(<span class="hljs-string">"rss"</span>, matcher)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>rss.go主要有两个方法retrieve和Search，retrieve负责抓取网略资源，search负责匹配，具体匹配方法这里不表了</p>
+<h2 id="2-5-小结"><a href="#2-5-小结" class="headerlink" title="2.5 小结"></a>2.5 小结</h2><ul>
 <li>每个代码文件都属于一个包，而包名应该与代码文件所在的文件夹同名。</li>
 <li>Go 语言提供了多种声明和初始化变量的方式。如果变量的值没有显式初始化，编译器会将变量初始化为零值。</li>
 <li>使用指针可以在函数间或者goroutine 间共享数据。</li>
@@ -648,7 +716,7 @@
                         Posts
                     </p>
                     <p class="title has-text-weight-normal">
-                        6
+                        7
                     </p>
                 </div>
             </div>
@@ -771,7 +839,7 @@
                 <span class="level-item">Go In Action</span>
             </span>
             <span class="level-end">
-                <span class="level-item tag">2</span>
+                <span class="level-item tag">3</span>
             </span>
         </a></li><li>
         <a class="level is-marginless" href="/categories/Python/">
@@ -815,6 +883,25 @@
         <h3 class="menu-label">
             Recent
         </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/04/12/go_pack_tool/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time></div>
+                    <a href="/2019/04/12/go_pack_tool/" class="has-link-black-ter is-size-6">打包和工具链-《Go In Action》-Ch3</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
         
         <article class="media">
             
@@ -892,25 +979,6 @@
             </div>
         </article>
         
-        <article class="media">
-            
-            <a href="/2017/12/05/safe-singleton/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/thread-safe-singleton.jpg" alt="一个线程安全的单例模式">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-05T02:30:21.000Z">2017-12-05</time></div>
-                    <a href="/2017/12/05/safe-singleton/" class="has-link-black-ter is-size-6">一个线程安全的单例模式</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/java/">java</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
     </div>
 </div>
 
@@ -929,7 +997,7 @@
                     <span class="level-item">April 2019</span>
                 </span>
                 <span class="level-end">
-                    <span class="level-item tag">2</span>
+                    <span class="level-item tag">3</span>
                 </span>
             </a>
         </li>
@@ -972,7 +1040,7 @@
                 <div class="control">
                     <a class="tags has-addons" href="/tags/Golang/">
                         <span class="tag">Golang</span>
-                        <span class="tag is-grey">2</span>
+                        <span class="tag is-grey">3</span>
                     </a>
                 </div>
                 
@@ -1043,6 +1111,25 @@
         
         <article class="media">
             
+            <a href="/2019/04/12/go_pack_tool/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time></div>
+                    <a href="/2019/04/12/go_pack_tool/" class="has-link-black-ter is-size-6">打包和工具链-《Go In Action》-Ch3</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
             <a href="/2019/04/11/go_intro/" class="media-left">
                 <p class="image is-64x64">
                     <img class="thumbnail" src="/css/images/golang.png" alt="关于go语言的介绍-《Go In Action》-Ch1">
@@ -1117,25 +1204,6 @@
             </div>
         </article>
         
-        <article class="media">
-            
-            <a href="/2017/12/05/safe-singleton/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/thread-safe-singleton.jpg" alt="一个线程安全的单例模式">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-12-05T02:30:21.000Z">2017-12-05</time></div>
-                    <a href="/2017/12/05/safe-singleton/" class="has-link-black-ter is-size-6">一个线程安全的单例模式</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/java/">java</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
     </div>
 </div>
 
@@ -1154,7 +1222,7 @@
                     <span class="level-item">April 2019</span>
                 </span>
                 <span class="level-end">
-                    <span class="level-item tag">2</span>
+                    <span class="level-item tag">3</span>
                 </span>
             </a>
         </li>
@@ -1197,7 +1265,7 @@
                 <div class="control">
                     <a class="tags has-addons" href="/tags/Golang/">
                         <span class="tag">Golang</span>
-                        <span class="tag is-grey">2</span>
+                        <span class="tag is-grey">3</span>
                     </a>
                 </div>
                 
