@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+<title>Go语言的类型系统 -《Go In Action》-Ch5 - duoduo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+    
+    <meta name="description" content="Go语言是一种静态类型的编程语言，编译器需要在编译时知道每个值的类型 5.1 用户定义类型声明一个新类型，即告诉编译器类型需要的内存大小和表示信息。 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455// 第一种声明方式type user stru">
+<meta name="keywords" content="Golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go语言的类型系统 -《Go In Action》-Ch5">
+<meta property="og:url" content="http://llplay.github.io/2019/04/13/go_type/index.html">
+<meta property="og:site_name" content="duoduo">
+<meta property="og:description" content="Go语言是一种静态类型的编程语言，编译器需要在编译时知道每个值的类型 5.1 用户定义类型声明一个新类型，即告诉编译器类型需要的内存大小和表示信息。 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455// 第一种声明方式type user stru">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://llplay.github.io/css/images/golang.png">
+<meta property="og:updated_time" content="2019-04-13T09:26:19.258Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Go语言的类型系统 -《Go In Action》-Ch5">
+<meta name="twitter:description" content="Go语言是一种静态类型的编程语言，编译器需要在编译时知道每个值的类型 5.1 用户定义类型声明一个新类型，即告诉编译器类型需要的内存大小和表示信息。 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455// 第一种声明方式type user stru">
+<meta name="twitter:image" content="http://llplay.github.io/css/images/golang.png">
+
+
+
+
+
+
+
+<link rel="icon" href="/images/favicon.svg">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css">
+
+
+    
+    
+    
+    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+    
+
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+    
+
+    
+    
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+
+    
+    
+    
+    
+
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+    
+    
+    
+
+    
+    
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-3-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                <img src="/images/logo.svg" alt="Go语言的类型系统 -《Go In Action》-Ch5" height="28">
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item" href="/">Home</a>
+                
+                <a class="navbar-item" href="/archives">Archives</a>
+                
+                <a class="navbar-item" href="/categories">Categories</a>
+                
+                <a class="navbar-item" href="/tags">Tags</a>
+                
+                <a class="navbar-item" href="/about">About</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                    
+                    
+                    <a class="navbar-item" target="_blank" title="Download on GitHub" href="http://github.com/ppoffice/hexo-theme-icarus">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                    
+                
+                
+                
+                <a class="navbar-item search" title="Search" href="javascript:;">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8-tablet is-8-desktop is-6-widescreen has-order-2 column-main"><div class="card">
+    
+    <div class="card-image">
+        <span class="image is-7by1">
+            <img class="thumbnail" src="/css/images/golang.png" alt="Go语言的类型系统 -《Go In Action》-Ch5">
+        </span>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2019-04-13T09:49:15.000Z">2019-04-13</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    19 minutes read (About 2855 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                Go语言的类型系统 -《Go In Action》-Ch5
+            
+        </h1>
+        <div class="content">
+            <p>Go语言是一种静态类型的编程语言，编译器需要在编译时知道每个值的类型</p>
+<h2 id="5-1-用户定义类型"><a href="#5-1-用户定义类型" class="headerlink" title="5.1 用户定义类型"></a>5.1 用户定义类型</h2><p>声明一个新类型，即告诉编译器类型需要的内存大小和表示信息。</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// 第一种声明方式</span></span><br><span class="line"><span class="hljs-keyword">type</span> user <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	name  <span class="hljs-keyword">string</span></span><br><span class="line">	email <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// 使用结构类型声明变量，并初始化为其零值</span></span><br><span class="line"><span class="hljs-comment">// 声明user 类型的变量</span></span><br><span class="line"><span class="hljs-keyword">var</span> bill user</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// 使用结构字面量来声明一个结构类型的变量</span></span><br><span class="line"><span class="hljs-comment">// 声明user 类型的变量，并初始化所有字段</span></span><br><span class="line">lisa := user&#123;</span><br><span class="line">	name: <span class="hljs-string">"Lisa"</span>,</span><br><span class="line">	email: <span class="hljs-string">"lisa@email.com"</span>,</span><br><span class="line">	ext: <span class="hljs-number">123</span>,</span><br><span class="line">	privileged: <span class="hljs-literal">true</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// 不使用字段名，创建结构类型的值</span></span><br><span class="line"><span class="hljs-comment">// 声明user 类型的变量</span></span><br><span class="line">lisa := user&#123;<span class="hljs-string">"Lisa"</span>, <span class="hljs-string">"lisa@email.com"</span>, <span class="hljs-number">123</span>, <span class="hljs-literal">true</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// 使用其他结构类型声明字段</span></span><br><span class="line"><span class="hljs-comment">// admin 需要一个user 类型作为管理者，并附加权限</span></span><br><span class="line"><span class="hljs-keyword">type</span> admin <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	person user</span><br><span class="line">	level <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// 使用结构字面量来创建字段的值</span></span><br><span class="line"><span class="hljs-comment">// 声明admin 类型的变量</span></span><br><span class="line">fred := admin&#123;</span><br><span class="line">	person: user&#123;</span><br><span class="line">		name: <span class="hljs-string">"Lisa"</span>,</span><br><span class="line">		email: <span class="hljs-string">"lisa@email.com"</span>,</span><br><span class="line">		ext: <span class="hljs-number">123</span>,</span><br><span class="line">		privileged: <span class="hljs-literal">true</span>,</span><br><span class="line">	&#125;,</span><br><span class="line">	level: <span class="hljs-string">"super"</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// 第二种声明方式</span></span><br><span class="line"><span class="hljs-comment">// 基于int64 声明一个新类型</span></span><br><span class="line"><span class="hljs-comment">// int64 和 Duration 是两种不同的类型，int64是Duration的基础类型，试图对ini64和Duration相互赋值将产生编译错误</span></span><br><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"><span class="hljs-keyword">type</span> Duration <span class="hljs-keyword">int64</span></span><br><span class="line"></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-keyword">var</span> dur Duration</span><br><span class="line">	dur = <span class="hljs-keyword">int64</span>(<span class="hljs-number">1000</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// prog.go:7: cannot use int64(1000) (type int64) as type Duration</span></span><br><span class="line"><span class="hljs-comment">// in assignment</span></span><br></pre></td></tr></table></figure>
+<h2 id="5-2-方法"><a href="#5-2-方法" class="headerlink" title="5.2 方法"></a>5.2 方法</h2><p>方法能给用户定义的类型添加新的行为，方法实际上也是函数，只是在声明时，在关键字func和方法名之间的增加了一个参数，<br>这个参数被称为接收者，将函数和接收者的类型绑在一起。</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// 这个示例程序展示如何声明</span></span><br><span class="line"><span class="hljs-comment">// 并使用方法</span></span><br><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line"><span class="hljs-string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// user 在程序里定义一个用户类型</span></span><br><span class="line"><span class="hljs-keyword">type</span> user <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">name <span class="hljs-keyword">string</span></span><br><span class="line">email <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// notify 使用值接收者实现了一个方法</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(u user)</span> <span class="hljs-title">notify</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">fmt.Printf(<span class="hljs-string">"Sending User Email To %s&lt;%s&gt;\n"</span>,</span><br><span class="line">u.name,</span><br><span class="line">u.email)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// changeEmail 使用指针接收者实现了一个方法</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(u *user)</span> <span class="hljs-title">changeEmail</span><span class="hljs-params">(email <span class="hljs-keyword">string</span>)</span></span> &#123;</span><br><span class="line">u.email = email</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main 是应用程序的入口</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line"><span class="hljs-comment">// user 类型的值可以用来调用</span></span><br><span class="line"><span class="hljs-comment">// 使用值接收者声明的方法</span></span><br><span class="line">bill := user&#123;<span class="hljs-string">"Bill"</span>, <span class="hljs-string">"bill@email.com"</span>&#125;</span><br><span class="line">bill.notify()</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// 指向user 类型值的指针也可以用来调用</span></span><br><span class="line"><span class="hljs-comment">// 使用值接收者声明的方法</span></span><br><span class="line">lisa := &amp;user&#123;<span class="hljs-string">"Lisa"</span>, <span class="hljs-string">"lisa@email.com"</span>&#125;</span><br><span class="line">lisa.notify()</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// user 类型的值可以用来调用</span></span><br><span class="line"><span class="hljs-comment">// 使用指针接收者声明的方法</span></span><br><span class="line">bill.changeEmail(<span class="hljs-string">"bill@newdomain.com"</span>)</span><br><span class="line">bill.notify()</span><br></pre></td></tr></table></figure>
+<p>notify接受者是user值的一个副本，notify也可以使用指针调用，Go会在背后执行一个转换操作<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// Go在代码背后的执行动作</span></span><br><span class="line">lisa := &amp;user&#123;<span class="hljs-string">"Lisa"</span>, <span class="hljs-string">"lisa@email.com"</span>&#125;</span><br><span class="line">*(lisa).notify()</span><br></pre></td></tr></table></figure></p>
+<p>可以不到不管是使用值调用，还是使用指针调用，notify函数的接收者都是一个user的副本，对副本的修改并不会影响原来的值<br>changeEmail恰恰相反，他的接受者是指针，这种情况函数对值进行的修改，会影响到原来的变量值，绑定指针类型的函数，也可以接受值的调用<br>Go会在背后做如下优化<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(&amp;bill).changeEmail(<span class="hljs-string">"bill@newdomain.com"</span>)</span><br></pre></td></tr></table></figure></p>
+<h2 id="5-3-类型的本质"><a href="#5-3-类型的本质" class="headerlink" title="5.3 类型的本质"></a>5.3 类型的本质</h2><p>一个类型在以参数在函数间传递或者作为接受者绑定方法时，需要根据类型的特点以及使用的方法，去决定是传指针还是传值</p>
+<h3 id="5-3-1-内置类型"><a href="#5-3-1-内置类型" class="headerlink" title="5.3.1 内置类型"></a>5.3.1 内置类型</h3><p>原始的，内置类型是语言提供的一组类型，诸如数值类型、字符串类型和布尔类型，对于这种类型的传递一般是传值，因为对这些值进行增加或者删除的时候，会创建一个新的值</p>
+<h3 id="5-3-2-引用类型"><a href="#5-3-2-引用类型" class="headerlink" title="5.3.2 引用类型"></a>5.3.2 引用类型</h3><p>非原始的，引用类型诸如切片、映射、通道、接口和函数类型，每个引用类型包含一组独特的字段，用于管理底层数据。不需要共享一个引用类型的值，可以通过赋值来传递一个引用类型的值的副本，本质上这就是在共享底层数据结构</p>
+<h3 id="5-3-3-结构类型"><a href="#5-3-3-结构类型" class="headerlink" title="5.3.3 结构类型"></a>5.3.3 结构类型</h3><p>结构类型有可能是原始的，也有可能是非原始的，需要遵守上面内置类型和引用类型的规范。是使用值接受者还是使用指针接受者，不应该由该方法是否修改了接受到的值来决定，应该基于该类型的本质。</p>
+<h2 id="5-4-接口"><a href="#5-4-接口" class="headerlink" title="5.4 接口"></a>5.4 接口</h2><p>多态是指代码可以根据类型的具体实现采取不同行为的能力，如果一个类型实现了某个接口，所有使用这个接口的地方，都可以支持这种类型的值。</p>
+<h3 id="5-4-1-标准库"><a href="#5-4-1-标准库" class="headerlink" title="5.4.1 标准库"></a>5.4.1 标准库</h3><p>下面这个程序实现了类似于curl的基本功能，io.Copy的第一个参数是复制到的目标，这个参数是必须实现了io.Writer接口的值，os.Stdout实现了io.Writer。<br>io.Copy的第二个参数接收一个io.Reader接口类型的值，表示数据流入的源，http.Response.Body实现了io.Reader接口<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">	<span class="hljs-string">"io"</span></span><br><span class="line">	<span class="hljs-string">"net/http"</span></span><br><span class="line">	<span class="hljs-string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// init is called before main.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(os.Args) != <span class="hljs-number">2</span> &#123;</span><br><span class="line">		fmt.Println(<span class="hljs-string">"Usage: ./example2 &lt;url&gt;"</span>)</span><br><span class="line">		os.Exit(<span class="hljs-number">-1</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main is the entry point for the application.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Get a response from the web server.</span></span><br><span class="line">	r, err := http.Get(os.Args[<span class="hljs-number">1</span>])</span><br><span class="line">	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(err)</span><br><span class="line">		<span class="hljs-keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Copies from the Body to Stdout.</span></span><br><span class="line">	io.Copy(os.Stdout, r.Body)</span><br><span class="line">	<span class="hljs-keyword">if</span> err := r.Body.Close(); err != <span class="hljs-literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="5-4-2-实现"><a href="#5-4-2-实现" class="headerlink" title="5.4.2 实现"></a>5.4.2 实现</h3><p>接口是用来定义行为的类型。行为通过方法由用户定义的类型实现。用户定义的类型实现了某个接口类型声明的一组方法，那么这个用户定义的类型的值就可以赋给这个接口类型的值。这个赋值会把用户定义的类型的值存入接口类型的值。</p>
+<p>对接口值方法的调用会执行接口值里存储的用户定义的类型的值的方法。将自定义类型赋值给接口分两种情况，自定义类型的值赋值给接口值和自定义类型指针赋值给接口值。下面两幅图展示了分别赋值给接口值后接口值的内存布局</p>
+<p><img src="/2019/04/13/go_type/go_interface_1.png" alt="值赋值后接口值"><br><img src="/2019/04/13/go_type/go_interface_2.png" alt="指针赋值后接口值"></p>
+<p>接口值是两个字长度的数据结构，第一个字包含一个指向内部表的指针。内部表叫做iTable，包含了所存储的值的类型信息。iTable包含了已存储的值的类型信息和与这个值相关联的的一组方法。<br>第二个字是一个指向所存储值的指针。</p>
+<h3 id="5-4-3-方法集"><a href="#5-4-3-方法集" class="headerlink" title="5.4.3 方法集"></a>5.4.3 方法集</h3><p>方法集定义了接口的接受规则<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// notifier is an interface that defined notification</span></span><br><span class="line"><span class="hljs-comment">// type behavior.</span></span><br><span class="line"><span class="hljs-keyword">type</span> notifier <span class="hljs-keyword">interface</span> &#123;</span><br><span class="line">	notify()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// user defines a user in the program.</span></span><br><span class="line"><span class="hljs-keyword">type</span> user <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	name  <span class="hljs-keyword">string</span></span><br><span class="line">	email <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// notify implements a method with a pointer receiver.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(u *user)</span> <span class="hljs-title">notify</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="hljs-string">"Sending user email to %s&lt;%s&gt;\n"</span>,</span><br><span class="line">		u.name,</span><br><span class="line">		u.email)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main is the entry point for the application.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Create a value of type User and send a notification.</span></span><br><span class="line">	u := user&#123;<span class="hljs-string">"Bill"</span>, <span class="hljs-string">"bill@email.com"</span>&#125;</span><br><span class="line"></span><br><span class="line">	sendNotification(u)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// ./listing36.go:32: cannot use u (type user) as type</span></span><br><span class="line">	<span class="hljs-comment">//                     notifier in argument to sendNotification:</span></span><br><span class="line">	<span class="hljs-comment">//   user does not implement notifier</span></span><br><span class="line">	<span class="hljs-comment">//                          (notify method has pointer receiver)</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// sendNotification accepts values that implement the notifier</span></span><br><span class="line"><span class="hljs-comment">// interface and sends notifications.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">sendNotification</span><span class="hljs-params">(n notifier)</span></span> &#123;</span><br><span class="line">	n.notify()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的程序会编译失败，错误的原因是user类型的值并没有实现notify接口。这里涉及到了方法集的概念，方法集定义了一组关联到给定类型的值或指针的方法。<br>定义方法时使用的接收者的类型决定了这个方法时关联到值还是关联到指针，还是两个都关联。<br>Go语言规范里定义了方法集的规则。</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Values Methods Receivers</span><br><span class="line">-----------------------------------------------</span><br><span class="line">T      (t T)</span><br><span class="line">*T     (t T) and (t *T)</span><br><span class="line"></span><br><span class="line">Methods Receivers Values</span><br><span class="line">-----------------------------------------------</span><br><span class="line">(t T)             T and *T</span><br><span class="line">(t *T)            *T</span><br></pre></td></tr></table></figure>
+<p>也就是说T类型的方法集只包含了值接收者声明的方法。而*T的方法集即包含了值接收者声明的方法，也包含指针接受者声明的方法。<br>那么上面错误代码的解决方式就有两种，一种是sendNotification(&amp;n)，因为&amp;n即包含了值接收者方法，也包含了指针接收者方法。另一种是将notify修改为值接收方法。</p>
+<h3 id="5-4-4-多态"><a href="#5-4-4-多态" class="headerlink" title="5.4.4 多态"></a>5.4.4 多态</h3><p>在了解了方法集的基础上，这里给了一个展示接口的多态行为的例子<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// notifier is an interface that defines notification</span></span><br><span class="line"><span class="hljs-comment">// type behavior.</span></span><br><span class="line"><span class="hljs-keyword">type</span> notifier <span class="hljs-keyword">interface</span> &#123;</span><br><span class="line">	notify()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// user defines a user in the program.</span></span><br><span class="line"><span class="hljs-keyword">type</span> user <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	name  <span class="hljs-keyword">string</span></span><br><span class="line">	email <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// notify implements the notifier interface with a pointer receiver.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(u *user)</span> <span class="hljs-title">notify</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="hljs-string">"Sending user email to %s&lt;%s&gt;\n"</span>,</span><br><span class="line">		u.name,</span><br><span class="line">		u.email)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// admin defines a admin in the program.</span></span><br><span class="line"><span class="hljs-keyword">type</span> admin <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	name  <span class="hljs-keyword">string</span></span><br><span class="line">	email <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// notify implements the notifier interface with a pointer receiver.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(a *admin)</span> <span class="hljs-title">notify</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="hljs-string">"Sending admin email to %s&lt;%s&gt;\n"</span>,</span><br><span class="line">		a.name,</span><br><span class="line">		a.email)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main is the entry point for the application.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Create a user value and pass it to sendNotification.</span></span><br><span class="line">	bill := user&#123;<span class="hljs-string">"Bill"</span>, <span class="hljs-string">"bill@email.com"</span>&#125;</span><br><span class="line">	sendNotification(&amp;bill)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Create an admin value and pass it to sendNotification.</span></span><br><span class="line">	lisa := admin&#123;<span class="hljs-string">"Lisa"</span>, <span class="hljs-string">"lisa@email.com"</span>&#125;</span><br><span class="line">	sendNotification(&amp;lisa)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// sendNotification accepts values that implement the notifier</span></span><br><span class="line"><span class="hljs-comment">// interface and sends notifications.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">sendNotification</span><span class="hljs-params">(n notifier)</span></span> &#123;</span><br><span class="line">	n.notify()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到user和admin都实现了notify接口，对同一个行为做出了不同的表示。</p>
+<h2 id="5-6-嵌入类型"><a href="#5-6-嵌入类型" class="headerlink" title="5.6 嵌入类型"></a>5.6 嵌入类型</h2><p>将已有的类型直接声明在新的结构类型里被称为嵌入类型。通过嵌入类型，与内部类型相关的标识会提升到外部类型上。这些被提升的标识符和直接声明在外部类型里一样。也是外部类型的一部分。<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// user defines a user in the program.</span></span><br><span class="line"><span class="hljs-keyword">type</span> user <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	name  <span class="hljs-keyword">string</span></span><br><span class="line">	email <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// notify implements a method that can be called via</span></span><br><span class="line"><span class="hljs-comment">// a value of type user.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(u *user)</span> <span class="hljs-title">notify</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="hljs-string">"Sending user email to %s&lt;%s&gt;\n"</span>,</span><br><span class="line">		u.name,</span><br><span class="line">		u.email)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// admin represents an admin user with privileges.</span></span><br><span class="line"><span class="hljs-keyword">type</span> admin <span class="hljs-keyword">struct</span> &#123;</span><br><span class="line">	user  <span class="hljs-comment">// Embedded Type</span></span><br><span class="line">	level <span class="hljs-keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main is the entry point for the application.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Create an admin user.</span></span><br><span class="line">	ad := admin&#123;</span><br><span class="line">		user: user&#123;</span><br><span class="line">			name:  <span class="hljs-string">"john smith"</span>,</span><br><span class="line">			email: <span class="hljs-string">"john@yahoo.com"</span>,</span><br><span class="line">		&#125;,</span><br><span class="line">		level: <span class="hljs-string">"super"</span>,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// We can access the inner type's method directly.</span></span><br><span class="line">	ad.user.notify()</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// The inner type's method is promoted.</span></span><br><span class="line">	ad.notify()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到user被嵌入到admin中，user的notify方法也被提升到了admin类型上，可以直接调用。如果admin自己也实现了notify接口，这时候user的notify方法不会被提升。</p>
+<h2 id="5-6-公开和未公开的标识符"><a href="#5-6-公开和未公开的标识符" class="headerlink" title="5.6 公开和未公开的标识符"></a>5.6 公开和未公开的标识符</h2><p>当一个标识符的名字以小写字母开头时，这个标识符就是未公开的，即包外的代码不可见。大写字母开头表示是公开的，对包外的代码可见。</p>
+<h2 id="5-7-小结"><a href="#5-7-小结" class="headerlink" title="5.7 小结"></a>5.7 小结</h2><p>使用关键字struct或者通过指定已存在的类型，可以声明用户定义的类型<br>方法提供了一种给用户定义的类型增加行为的方式<br>设计类型时需要确认类型的本质是原始的还是非原始的<br>接口是声明了一组行为并支持多态的类型<br>嵌入类型提供了扩展类型的能力，而无需使用继承<br>标识符要么是从包里公开的，要么是在包里未公开的</p>
+
+        </div>
+        
+        <div class="level is-size-7 is-uppercase">
+            <div class="level-start">
+                <div class="level-item">
+                    <span class="is-size-6 has-text-grey has-mr-7">#</span>
+                    <a class="has-link-grey -link" href="/tags/Golang/">Golang</a>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+    </div>
+</div>
+
+
+
+
+
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        
+        <div class="level-end">
+            <a class="level level-item has-link-grey  article-nav-next" href="/2019/04/13/go_set/">
+                <span class="level-item">数组、切片和映射-《Go In Action》-Ch4</span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h3 class="title is-5 has-text-weight-normal">Comments</h3>
+        
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://llplay.github.io/2019/04/13/go_type/';
+        this.page.identifier = '2019/04/13/go_type/';
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'yanglingduo' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </div>
+</div>
+</div>
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen  has-order-1 column-left ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <nav class="level">
+            <div class="level-item has-text-centered">
+                <div>
+                    
+                        <img class="image is-128x128 has-mb-6" src="/css/images/helloworld.png" alt="Lingduo Yang">
+                    
+                    
+                    <p class="is-size-4 is-block">
+                        Lingduo Yang
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-block">
+                        R&amp;D
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-flex is-flex-center has-text-grey">
+                        <i class="fas fa-map-marker-alt has-mr-7"></i>
+                        <span>Beijing</span>
+                    </p>
+                    
+                </div>
+            </div>
+        </nav>
+        <nav class="level is-mobile">
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Posts
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        9
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Categories
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        3
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Tags
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        7
+                    </p>
+                </div>
+            </div>
+        </nav>
+        <div class="level">
+            <a class="level-item button is-link is-rounded" href="http://github.com/ppoffice" target="_blank">
+                Follow</a>
+        </div>
+        
+        
+        <div class="level is-mobile">
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Github" href="http://github.com/ppoffice">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Facebook" href="http://facebook.com">
+                
+                <i class="fab fa-facebook"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Twitter" href="http://twitter.com">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Dribbble" href="http://dribbble.com">
+                
+                <i class="fab fa-dribbble"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="RSS" href="/">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+            
+        </div>
+        
+    </div>
+</div>
+    
+        
+    
+        
+
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Links
+        </h3>
+        <ul class="menu-list">
+        
+            <li>
+                <a class="level is-mobile" href="https://hexo.io" target="_blank">
+                    <span class="level-left">
+                        <span class="level-item">Hexo</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">hexo.io</span>
+                    </span>
+                </a>
+            </li>
+        
+            <li>
+                <a class="level is-mobile" href="https://github.com/ppoffice" target="_blank">
+                    <span class="level-left">
+                        <span class="level-item">PPOffice</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">github.com</span>
+                    </span>
+                </a>
+            </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+
+
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Categories
+            </h3>
+            <ul class="menu-list">
+            <li>
+        <a class="level is-marginless" href="/categories/Go-In-Action/">
+            <span class="level-start">
+                <span class="level-item">Go In Action</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">5</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/Python/">
+            <span class="level-start">
+                <span class="level-item">Python</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">2</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/java/">
+            <span class="level-start">
+                <span class="level-item">java</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">2</span>
+            </span>
+        </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Tag Cloud
+        </h3>
+        <a href="/tags/Golang/" style="font-size: 20px;">Golang</a> <a href="/tags/单例模式/" style="font-size: 10px;">单例模式</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/生产者消费者模型/" style="font-size: 10px;">生产者消费者模型</a> <a href="/tags/线程安全/" style="font-size: 10px;">线程安全</a> <a href="/tags/装饰器/" style="font-size: 10px;">装饰器</a> <a href="/tags/闭包/" style="font-size: 10px;">闭包</a>
+    </div>
+</div>
+
+    
+    
+        <div class="column-right-shadow is-hidden-widescreen ">
+        
+            
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Recent
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_type/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="Go语言的类型系统 -《Go In Action》-Ch5">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T09:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_type/" class="has-link-black-ter is-size-6">Go语言的类型系统 -《Go In Action》-Ch5</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_set/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="数组、切片和映射-《Go In Action》-Ch4">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T02:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_set/" class="has-link-black-ter is-size-6">数组、切片和映射-《Go In Action》-Ch4</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/12/go_pack_tool/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time></div>
+                    <a href="/2019/04/12/go_pack_tool/" class="has-link-black-ter is-size-6">打包和工具链-《Go In Action》-Ch3</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/11/go_quick_prog/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="快速开始一个GO程序-《Go In Action》-Ch2">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time></div>
+                    <a href="/2019/04/11/go_quick_prog/" class="has-link-black-ter is-size-6">快速开始一个GO程序-《Go In Action》-Ch2</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/10/go_intro/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="关于go语言的介绍-《Go In Action》-Ch1">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-10T08:49:15.000Z">2019-04-10</time></div>
+                    <a href="/2019/04/10/go_intro/" class="has-link-black-ter is-size-6">关于go语言的介绍-《Go In Action》-Ch1</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Archives
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/04/">
+                <span class="level-start">
+                    <span class="level-item">April 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">5</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/03/">
+                <span class="level-start">
+                    <span class="level-item">March 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/12/">
+                <span class="level-start">
+                    <span class="level-item">December 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">3</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Tags
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Golang/">
+                        <span class="tag">Golang</span>
+                        <span class="tag is-grey">5</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/单例模式/">
+                        <span class="tag">单例模式</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/多线程/">
+                        <span class="tag">多线程</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/生产者消费者模型/">
+                        <span class="tag">生产者消费者模型</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/线程安全/">
+                        <span class="tag">线程安全</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/装饰器/">
+                        <span class="tag">装饰器</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/闭包/">
+                        <span class="tag">闭包</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+        
+        </div>
+    
+</div>
+
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only has-order-3 column-right ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Recent
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_type/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="Go语言的类型系统 -《Go In Action》-Ch5">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T09:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_type/" class="has-link-black-ter is-size-6">Go语言的类型系统 -《Go In Action》-Ch5</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_set/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="数组、切片和映射-《Go In Action》-Ch4">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T02:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_set/" class="has-link-black-ter is-size-6">数组、切片和映射-《Go In Action》-Ch4</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/12/go_pack_tool/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time></div>
+                    <a href="/2019/04/12/go_pack_tool/" class="has-link-black-ter is-size-6">打包和工具链-《Go In Action》-Ch3</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/11/go_quick_prog/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="快速开始一个GO程序-《Go In Action》-Ch2">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-11T08:49:15.000Z">2019-04-11</time></div>
+                    <a href="/2019/04/11/go_quick_prog/" class="has-link-black-ter is-size-6">快速开始一个GO程序-《Go In Action》-Ch2</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/10/go_intro/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="关于go语言的介绍-《Go In Action》-Ch1">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-10T08:49:15.000Z">2019-04-10</time></div>
+                    <a href="/2019/04/10/go_intro/" class="has-link-black-ter is-size-6">关于go语言的介绍-《Go In Action》-Ch1</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Archives
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/04/">
+                <span class="level-start">
+                    <span class="level-item">April 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">5</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/03/">
+                <span class="level-start">
+                    <span class="level-item">March 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/12/">
+                <span class="level-start">
+                    <span class="level-item">December 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">3</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Tags
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Golang/">
+                        <span class="tag">Golang</span>
+                        <span class="tag is-grey">5</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/单例模式/">
+                        <span class="tag">单例模式</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/多线程/">
+                        <span class="tag">多线程</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/生产者消费者模型/">
+                        <span class="tag">生产者消费者模型</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/线程安全/">
+                        <span class="tag">线程安全</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/装饰器/">
+                        <span class="tag">装饰器</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/闭包/">
+                        <span class="tag">闭包</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</div>
+
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <a class="footer-logo is-block has-mb-6" href="/">
+                
+                    <img src="/images/logo.svg" alt="Go语言的类型系统 -《Go In Action》-Ch5" height="28">
+                
+                </a>
+                <p class="is-size-7">
+                &copy; 2019 lingduo.yang&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
+                
+                </p>
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Creative Commons" href="https://creativecommons.org/">
+                        
+                        <i class="fab fa-creative-commons"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
+                        
+                        <i class="fab fa-creative-commons-by"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Download on GitHub" href="http://github.com/ppoffice/hexo-theme-icarus">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("en");</script>
+
+
+    
+    
+    
+    <script src="/js/animation.js"></script>
+    
+
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+    <script src="/js/gallery.js" defer></script>
+    
+
+    
+    
+
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+
+    
+    
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    MathJax.Hub.Config({
+        'HTML-CSS': {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+});
+</script>
+
+    
+    
+
+<a id="back-to-top" title="Back to Top" href="javascript:;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+    <script src="/js/clipboard.js" defer></script>
+    
+
+    
+    
+    
+
+
+<script src="/js/main.js" defer></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+</body>
+</html>
