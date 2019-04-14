@@ -137,6 +137,78 @@
     <div class="card">
     
     <div class="card-image">
+        <a href="/2019/04/13/go_goroutine/" class="image is-7by1">
+            <img class="thumbnail" src="/css/images/golang.png" alt="并发 -《Go In Action》-Ch6">
+        </a>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2019-04-13T10:49:15.000Z">2019-04-13</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    14 minutes read (About 2088 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                <a class="has-link-black-ter" href="/2019/04/13/go_goroutine/">并发 -《Go In Action》-Ch6</a>
+            
+        </h1>
+        <div class="content">
+            <p>每个goroutine是一个独立的工作单元，这个单元会被调度到可用的逻辑处理器上执行。Go运行时通过调度器管理goroutine，为其分配执行时间。<br>调度器在操作系统之上，将操作系统的线程和语言运行时的逻辑处理器绑定，并在逻辑处理器上运行goroutine。<br>Go语言通过在goroutine之间传递数据来通信，而不是对数据加锁来实现同步访问。</p>
+<h2 id="6-1-并行和并发"><a href="#6-1-并行和并发" class="headerlink" title="6.1 并行和并发"></a>6.1 并行和并发</h2><p><img src="/2019/04/13/go_goroutine/go_goroutine_1.png" alt="Go调度器如何管理goroutine"></p>
+<p>并发是让不同的代码片段同时在不同的物理处理器上执行，并发是指同时管理很多事情。<br>每当创建一个goroutine并准备运行，goroutine被分配到调度器的全局队列中，调度器会给goroutine分配一个逻辑处理器，将goroutine放到逻辑处理器对应的本地队列中。</p>
+<p><img src="/2019/04/13/go_goroutine/go_goroutine_2.png" alt="并发和并行的区别"></p>
+<h2 id="6-2-goroutine"><a href="#6-2-goroutine" class="headerlink" title="6.2 goroutine"></a>6.2 goroutine</h2><p>下面这个程序展示了逻辑处理器是如何调度goroutine的，runtime.GOMAXPROCS(1)只允许程序使用一个逻辑处理器。</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">	<span class="hljs-string">"runtime"</span></span><br><span class="line">	<span class="hljs-string">"sync"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// wg is used to wait for the program to finish.</span></span><br><span class="line"><span class="hljs-keyword">var</span> wg sync.WaitGroup</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main is the entry point for all Go programs.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Allocate 1 logical processors for the scheduler to use.</span></span><br><span class="line">	runtime.GOMAXPROCS(<span class="hljs-number">1</span>)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Add a count of two, one for each goroutine.</span></span><br><span class="line">	wg.Add(<span class="hljs-number">2</span>)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Create two goroutines.</span></span><br><span class="line">	fmt.Println(<span class="hljs-string">"Create Goroutines"</span>)</span><br><span class="line">	<span class="hljs-keyword">go</span> printPrime(<span class="hljs-string">"A"</span>)</span><br><span class="line">	<span class="hljs-keyword">go</span> printPrime(<span class="hljs-string">"B"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Wait for the goroutines to finish.</span></span><br><span class="line">	fmt.Println(<span class="hljs-string">"Waiting To Finish"</span>)</span><br><span class="line">	wg.Wait()</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="hljs-string">"Terminating Program"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// printPrime displays prime numbers for the first 5000 numbers.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">printPrime</span><span class="hljs-params">(prefix <span class="hljs-keyword">string</span>)</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Schedule the call to Done to tell main we are done.</span></span><br><span class="line">	<span class="hljs-keyword">defer</span> wg.Done()</span><br><span class="line"></span><br><span class="line">next:</span><br><span class="line">	<span class="hljs-keyword">for</span> outer := <span class="hljs-number">2</span>; outer &lt; <span class="hljs-number">5000</span>; outer++ &#123;</span><br><span class="line">		<span class="hljs-keyword">for</span> inner := <span class="hljs-number">2</span>; inner &lt; outer; inner++ &#123;</span><br><span class="line">			<span class="hljs-keyword">if</span> outer%inner == <span class="hljs-number">0</span> &#123;</span><br><span class="line">				<span class="hljs-keyword">continue</span> next</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Printf(<span class="hljs-string">"%s:%d\n"</span>, prefix, outer)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="hljs-string">"Completed"</span>, prefix)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// output</span></span><br><span class="line"><span class="hljs-comment">// Create Goroutines</span></span><br><span class="line"><span class="hljs-comment">// Waiting To Finish</span></span><br><span class="line"><span class="hljs-comment">// B:2</span></span><br><span class="line"><span class="hljs-comment">// B:3</span></span><br><span class="line"><span class="hljs-comment">// ...</span></span><br><span class="line"><span class="hljs-comment">// B:4583</span></span><br><span class="line"><span class="hljs-comment">// B:4591</span></span><br><span class="line"><span class="hljs-comment">// A:3 ** 切换 goroutine</span></span><br><span class="line"><span class="hljs-comment">// A:5</span></span><br><span class="line"><span class="hljs-comment">// ...</span></span><br><span class="line"><span class="hljs-comment">// A:4561</span></span><br><span class="line"><span class="hljs-comment">// A:4567</span></span><br><span class="line"><span class="hljs-comment">// B:4603 ** 切换 goroutine</span></span><br><span class="line"><span class="hljs-comment">// B:4621</span></span><br><span class="line"><span class="hljs-comment">// ...</span></span><br><span class="line"><span class="hljs-comment">// Completed B</span></span><br><span class="line"><span class="hljs-comment">// A:4457 ** 切换 goroutine</span></span><br><span class="line"><span class="hljs-comment">// A:4463</span></span><br><span class="line"><span class="hljs-comment">// ...</span></span><br><span class="line"><span class="hljs-comment">// A:4993</span></span><br><span class="line"><span class="hljs-comment">// A:4999</span></span><br><span class="line"><span class="hljs-comment">// Completed A</span></span><br><span class="line"><span class="hljs-comment">// Terminating Program</span></span><br></pre></td></tr></table></figure>
+<p>可以看到goroutine A和B是交替运行的，因为只有一个逻辑处理器。调度过程可以用下图表示:</p>
+<p><img src="/2019/04/13/go_goroutine/go_goroutine_3.png" alt="逻辑处理器调度goroutine"></p>
+<h2 id="6-3-竞争状态"><a href="#6-3-竞争状态" class="headerlink" title="6.3 竞争状态"></a>6.3 竞争状态</h2><p>多个goroutine同时对一个共享资源进行读和写，容易进入相互竞争的状态<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">	<span class="hljs-string">"runtime"</span></span><br><span class="line">	<span class="hljs-string">"sync"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">var</span> (</span><br><span class="line">	<span class="hljs-comment">// counter is a variable incremented by all goroutines.</span></span><br><span class="line">	counter <span class="hljs-keyword">int</span></span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// wg is used to wait for the program to finish.</span></span><br><span class="line">	wg sync.WaitGroup</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main is the entry point for all Go programs.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Add a count of two, one for each goroutine.</span></span><br><span class="line">	wg.Add(<span class="hljs-number">2</span>)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Create two goroutines.</span></span><br><span class="line">	<span class="hljs-keyword">go</span> incCounter(<span class="hljs-number">1</span>)</span><br><span class="line">	<span class="hljs-keyword">go</span> incCounter(<span class="hljs-number">2</span>)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Wait for the goroutines to finish.</span></span><br><span class="line">	wg.Wait()</span><br><span class="line">	fmt.Println(<span class="hljs-string">"Final Counter:"</span>, counter)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// incCounter increments the package level counter variable.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">incCounter</span><span class="hljs-params">(id <span class="hljs-keyword">int</span>)</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Schedule the call to Done to tell main we are done.</span></span><br><span class="line">	<span class="hljs-keyword">defer</span> wg.Done()</span><br><span class="line"></span><br><span class="line">	<span class="hljs-keyword">for</span> count := <span class="hljs-number">0</span>; count &lt; <span class="hljs-number">2</span>; count++ &#123;</span><br><span class="line">		<span class="hljs-comment">// Capture the value of Counter.</span></span><br><span class="line">		value := counter</span><br><span class="line"></span><br><span class="line">		<span class="hljs-comment">// Yield the thread and be placed back in queue.</span></span><br><span class="line">		runtime.Gosched()</span><br><span class="line"></span><br><span class="line">		<span class="hljs-comment">// Increment our local value of Counter.</span></span><br><span class="line">		value++</span><br><span class="line"></span><br><span class="line">		<span class="hljs-comment">// Store the value back into Counter.</span></span><br><span class="line">		counter = value</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后counter的值有可能是2，可以用下面这个图描述下过程</p>
+<p><img src="/2019/04/13/go_goroutine/go_compete.png" alt="竞争状态下程序行为的图像表达"></p>
+<p>可以用go build -race检测代码里的竞争状态</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">go</span> build -race <span class="hljs-comment">// 用竞争检测器标志来编译程序</span></span><br><span class="line">./example <span class="hljs-comment">// 运行程序</span></span><br><span class="line">==================</span><br><span class="line">WARNING: DATA RACE</span><br><span class="line">Write by goroutine <span class="hljs-number">5</span>:</span><br><span class="line">main.incCounter()</span><br><span class="line">/example/main.<span class="hljs-keyword">go</span>:<span class="hljs-number">49</span> +<span class="hljs-number">0x96</span></span><br><span class="line">Previous read by goroutine <span class="hljs-number">6</span>:</span><br><span class="line">main.incCounter()</span><br><span class="line">/example/main.<span class="hljs-keyword">go</span>:<span class="hljs-number">40</span> +<span class="hljs-number">0x66</span></span><br><span class="line">Goroutine <span class="hljs-number">5</span> (running) created at:</span><br><span class="line">main.main()</span><br><span class="line">/example/main.<span class="hljs-keyword">go</span>:<span class="hljs-number">25</span> +<span class="hljs-number">0x5c</span></span><br><span class="line">Goroutine <span class="hljs-number">6</span> (running) created at:</span><br><span class="line">main.main()</span><br><span class="line">/example/main.<span class="hljs-keyword">go</span>:<span class="hljs-number">26</span> +<span class="hljs-number">0x73</span></span><br><span class="line">==================</span><br><span class="line">Final Counter: <span class="hljs-number">2</span></span><br><span class="line">Found <span class="hljs-number">1</span> data race(s)</span><br></pre></td></tr></table></figure>
+<h2 id="6-4-锁住共享资源"><a href="#6-4-锁住共享资源" class="headerlink" title="6.4 锁住共享资源"></a>6.4 锁住共享资源</h2><p>可以使用原子函数和互斥锁解决共享资源的问题</p>
+<h3 id="6-4-1-原子函数"><a href="#6-4-1-原子函数" class="headerlink" title="6.4.1 原子函数"></a>6.4.1 原子函数</h3><p>原子函数能够以很底层的加锁机制来同步访问整形变量和指针，atomic包提供了一些原子操作，如AddInt64，这个函数会同步整型类型的的加法<br>LoadInt64和StoreInt64，这两个函数提供了一种安全的读写一个整型值的方式。<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">var</span> count <span class="hljs-keyword">int64</span></span><br><span class="line">atomic.AddInt64(&amp;counter, <span class="hljs-number">1</span>)</span><br><span class="line">atomic.LoadInt64(&amp;cunter)</span><br><span class="line">atomic.StoreInt64(&amp;count, <span class="hljs-number">1</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="6-4-2-互斥锁"><a href="#6-4-2-互斥锁" class="headerlink" title="6.4.2 互斥锁"></a>6.4.2 互斥锁</h3><p>互斥锁用于在代码上创建一个临界区，保证同一时间只有一个goroutine 可以执行这个临界区代码<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mutex sync.Mutex</span><br><span class="line">mutex.Lock()</span><br><span class="line">...</span><br><span class="line">mutex.Unlock()</span><br></pre></td></tr></table></figure></p>
+<h2 id="6-5-通道"><a href="#6-5-通道" class="headerlink" title="6.5 通道"></a>6.5 通道</h2><p>可以使用make来创建通道<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// 无缓冲的整型通道</span></span><br><span class="line">unbuffered := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span><br><span class="line"><span class="hljs-comment">// 有缓冲的字符串通道</span></span><br><span class="line">buffered := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">string</span>, <span class="hljs-number">10</span>)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// 向通道发送值</span></span><br><span class="line">buffered &lt;- <span class="hljs-string">"Gopher"</span></span><br><span class="line"><span class="hljs-comment">// 从通道里接收值</span></span><br><span class="line">value := &lt;-buffered</span><br></pre></td></tr></table></figure></p>
+<p>无缓冲的通道（unbuffered channel）是指在接收前没有能力保存任何值的通道。这种类型的通<br>道要求发送goroutine 和接收goroutine 同时准备好，才能完成发送和接收操作。如果两个goroutine<br>没有同时准备好，通道会导致先执行发送或接收操作的goroutine 阻塞等待。这种对通道进行发送<br>和接收的交互行为本身就是同步的。其中任意一个操作都无法离开另一个操作单独存在。</p>
+<figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// This sample program demonstrates how to use an unbuffered</span></span><br><span class="line"><span class="hljs-comment">// channel to simulate a relay race between four goroutines.</span></span><br><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">	<span class="hljs-string">"sync"</span></span><br><span class="line">	<span class="hljs-string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// wg is used to wait for the program to finish.</span></span><br><span class="line"><span class="hljs-keyword">var</span> wg sync.WaitGroup</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main is the entry point for all Go programs.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Create an unbuffered channel.</span></span><br><span class="line">	baton := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Add a count of one for the last runner.</span></span><br><span class="line">	wg.Add(<span class="hljs-number">1</span>)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// First runner to his mark.</span></span><br><span class="line">	<span class="hljs-keyword">go</span> Runner(baton)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Start the race.</span></span><br><span class="line">	baton &lt;- <span class="hljs-number">1</span></span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Wait for the race to finish.</span></span><br><span class="line">	wg.Wait()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// Runner simulates a person running in the relay race.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Runner</span><span class="hljs-params">(baton <span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span></span> &#123;</span><br><span class="line">	<span class="hljs-keyword">var</span> newRunner <span class="hljs-keyword">int</span></span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Wait to receive the baton.</span></span><br><span class="line">	runner := &lt;-baton</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Start running around the track.</span></span><br><span class="line">	fmt.Printf(<span class="hljs-string">"Runner %d Running With Baton\n"</span>, runner)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// New runner to the line.</span></span><br><span class="line">	<span class="hljs-keyword">if</span> runner != <span class="hljs-number">4</span> &#123;</span><br><span class="line">		newRunner = runner + <span class="hljs-number">1</span></span><br><span class="line">		fmt.Printf(<span class="hljs-string">"Runner %d To The Line\n"</span>, newRunner)</span><br><span class="line">		<span class="hljs-keyword">go</span> Runner(baton)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Running around the track.</span></span><br><span class="line">	time.Sleep(<span class="hljs-number">100</span> * time.Millisecond)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Is the race over.</span></span><br><span class="line">	<span class="hljs-keyword">if</span> runner == <span class="hljs-number">4</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="hljs-string">"Runner %d Finished, Race Over\n"</span>, runner)</span><br><span class="line">		wg.Done()</span><br><span class="line">		<span class="hljs-keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Exchange the baton for the next runner.</span></span><br><span class="line">	fmt.Printf(<span class="hljs-string">"Runner %d Exchange With Runner %d\n"</span>,</span><br><span class="line">		runner,</span><br><span class="line">		newRunner)</span><br><span class="line"></span><br><span class="line">	baton &lt;- newRunner</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>有缓冲的通道（buffered channel）是一种在被接收前能存储一个或者多个值的通道。这种类<br>型的通道并不强制要求goroutine 之间必须同时完成发送和接收。通道会阻塞发送和接收动作的<br>条件也会不同。只有在通道中没有要接收的值时，接收动作才会阻塞。只有在通道没有可用缓冲<br>区容纳被发送的值时，发送动作才会阻塞。这导致有缓冲的通道和无缓冲的通道之间的一个很大<br>的不同：无缓冲的通道保证进行发送和接收的goroutine 会在同一时间进行数据交换；有缓冲的<br>通道没有这种保证。<br><figure class="highlight golang hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">// This sample program demonstrates how to use a buffered</span></span><br><span class="line"><span class="hljs-comment">// channel to work on multiple tasks with a predefined number</span></span><br><span class="line"><span class="hljs-comment">// of goroutines.</span></span><br><span class="line"><span class="hljs-keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">import</span> (</span><br><span class="line">	<span class="hljs-string">"fmt"</span></span><br><span class="line">	<span class="hljs-string">"math/rand"</span></span><br><span class="line">	<span class="hljs-string">"sync"</span></span><br><span class="line">	<span class="hljs-string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-keyword">const</span> (</span><br><span class="line">	numberGoroutines = <span class="hljs-number">4</span>  <span class="hljs-comment">// Number of goroutines to use.</span></span><br><span class="line">	taskLoad         = <span class="hljs-number">10</span> <span class="hljs-comment">// Amount of work to process.</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// wg is used to wait for the program to finish.</span></span><br><span class="line"><span class="hljs-keyword">var</span> wg sync.WaitGroup</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// init is called to initialize the package by the</span></span><br><span class="line"><span class="hljs-comment">// Go runtime prior to any other code being executed.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Seed the random number generator.</span></span><br><span class="line">	rand.Seed(time.Now().Unix())</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// main is the entry point for all Go programs.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Create a buffered channel to manage the task load.</span></span><br><span class="line">	tasks := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">string</span>, taskLoad)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Launch goroutines to handle the work.</span></span><br><span class="line">	wg.Add(numberGoroutines)</span><br><span class="line">	<span class="hljs-keyword">for</span> gr := <span class="hljs-number">1</span>; gr &lt;= numberGoroutines; gr++ &#123;</span><br><span class="line">		<span class="hljs-keyword">go</span> worker(tasks, gr)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Add a bunch of work to get done.</span></span><br><span class="line">	<span class="hljs-keyword">for</span> post := <span class="hljs-number">1</span>; post &lt;= taskLoad; post++ &#123;</span><br><span class="line">		tasks &lt;- fmt.Sprintf(<span class="hljs-string">"Task : %d"</span>, post)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Close the channel so the goroutines will quit</span></span><br><span class="line">	<span class="hljs-comment">// when all the work is done.</span></span><br><span class="line">	<span class="hljs-built_in">close</span>(tasks)</span><br><span class="line"></span><br><span class="line">	<span class="hljs-comment">// Wait for all the work to get done.</span></span><br><span class="line">	wg.Wait()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="hljs-comment">// worker is launched as a goroutine to process work from</span></span><br><span class="line"><span class="hljs-comment">// the buffered channel.</span></span><br><span class="line"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">worker</span><span class="hljs-params">(tasks <span class="hljs-keyword">chan</span> <span class="hljs-keyword">string</span>, worker <span class="hljs-keyword">int</span>)</span></span> &#123;</span><br><span class="line">	<span class="hljs-comment">// Report that we just returned.</span></span><br><span class="line">	<span class="hljs-keyword">defer</span> wg.Done()</span><br><span class="line"></span><br><span class="line">	<span class="hljs-keyword">for</span> &#123;</span><br><span class="line">		<span class="hljs-comment">// Wait for work to be assigned.</span></span><br><span class="line">		task, ok := &lt;-tasks</span><br><span class="line">		<span class="hljs-keyword">if</span> !ok &#123;</span><br><span class="line">			<span class="hljs-comment">// This means the channel is empty and closed.</span></span><br><span class="line">			fmt.Printf(<span class="hljs-string">"Worker: %d : Shutting Down\n"</span>, worker)</span><br><span class="line">			<span class="hljs-keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="hljs-comment">// Display we are starting the work.</span></span><br><span class="line">		fmt.Printf(<span class="hljs-string">"Worker: %d : Started %s\n"</span>, worker, task)</span><br><span class="line"></span><br><span class="line">		<span class="hljs-comment">// Randomly wait to simulate work time.</span></span><br><span class="line">		sleep := rand.Int63n(<span class="hljs-number">100</span>)</span><br><span class="line">		time.Sleep(time.Duration(sleep) * time.Millisecond)</span><br><span class="line"></span><br><span class="line">		<span class="hljs-comment">// Display we finished the work.</span></span><br><span class="line">		fmt.Printf(<span class="hljs-string">"Worker: %d : Completed %s\n"</span>, worker, task)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面代码需要注意的是close(tasks)，关闭通道后，goroutine依旧可以从通道接收数据，但是不能再向通道里发送数据。</p>
+<h2 id="6-6-小结"><a href="#6-6-小结" class="headerlink" title="6.6 小结"></a>6.6 小结</h2><p>并发是指goroutine运行的时候是相互独立的<br>使用关键字go创建goroutine来运行函数<br>goroutine在逻辑处理器上执行，逻辑处理器具有独立的系统线程和运行队列<br>竞争状态是指两个或者多个goroutine试图访问同一个资源<br>原子函数和互斥锁提供了一种防止出现竞争状态的办法<br>通道提供了一种在两个goroutine之间共享数据的简单方法<br>无缓冲的通道保证同时交换数据，而有缓冲的通道不做这种保证</p>
+
+        </div>
+        
+        
+        
+    </div>
+</div>
+
+
+
+
+
+
+
+
+    <div class="card">
+    
+    <div class="card-image">
         <a href="/2019/04/13/go_type/" class="image is-7by1">
             <img class="thumbnail" src="/css/images/golang.png" alt="Go语言的类型系统 -《Go In Action》-Ch5">
         </a>
@@ -863,7 +935,7 @@
                         Posts
                     </p>
                     <p class="title has-text-weight-normal">
-                        9
+                        10
                     </p>
                 </div>
             </div>
@@ -986,7 +1058,7 @@
                 <span class="level-item">Go In Action</span>
             </span>
             <span class="level-end">
-                <span class="level-item tag">5</span>
+                <span class="level-item tag">6</span>
             </span>
         </a></li><li>
         <a class="level is-marginless" href="/categories/Python/">
@@ -1030,6 +1102,25 @@
         <h3 class="menu-label">
             Recent
         </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_goroutine/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="并发 -《Go In Action》-Ch6">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T10:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_goroutine/" class="has-link-black-ter is-size-6">并发 -《Go In Action》-Ch6</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
         
         <article class="media">
             
@@ -1107,25 +1198,6 @@
             </div>
         </article>
         
-        <article class="media">
-            
-            <a href="/2019/04/10/go_intro/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/golang.png" alt="关于go语言的介绍-《Go In Action》-Ch1">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-10T08:49:15.000Z">2019-04-10</time></div>
-                    <a href="/2019/04/10/go_intro/" class="has-link-black-ter is-size-6">关于go语言的介绍-《Go In Action》-Ch1</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
     </div>
 </div>
 
@@ -1144,7 +1216,7 @@
                     <span class="level-item">April 2019</span>
                 </span>
                 <span class="level-end">
-                    <span class="level-item tag">5</span>
+                    <span class="level-item tag">6</span>
                 </span>
             </a>
         </li>
@@ -1187,7 +1259,7 @@
                 <div class="control">
                     <a class="tags has-addons" href="/tags/Golang/">
                         <span class="tag">Golang</span>
-                        <span class="tag is-grey">5</span>
+                        <span class="tag is-grey">6</span>
                     </a>
                 </div>
                 
@@ -1258,6 +1330,25 @@
         
         <article class="media">
             
+            <a href="/2019/04/13/go_goroutine/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="并发 -《Go In Action》-Ch6">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T10:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_goroutine/" class="has-link-black-ter is-size-6">并发 -《Go In Action》-Ch6</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
             <a href="/2019/04/13/go_type/" class="media-left">
                 <p class="image is-64x64">
                     <img class="thumbnail" src="/css/images/golang.png" alt="Go语言的类型系统 -《Go In Action》-Ch5">
@@ -1332,25 +1423,6 @@
             </div>
         </article>
         
-        <article class="media">
-            
-            <a href="/2019/04/10/go_intro/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/golang.png" alt="关于go语言的介绍-《Go In Action》-Ch1">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-10T08:49:15.000Z">2019-04-10</time></div>
-                    <a href="/2019/04/10/go_intro/" class="has-link-black-ter is-size-6">关于go语言的介绍-《Go In Action》-Ch1</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
     </div>
 </div>
 
@@ -1369,7 +1441,7 @@
                     <span class="level-item">April 2019</span>
                 </span>
                 <span class="level-end">
-                    <span class="level-item tag">5</span>
+                    <span class="level-item tag">6</span>
                 </span>
             </a>
         </li>
@@ -1412,7 +1484,7 @@
                 <div class="control">
                     <a class="tags has-addons" href="/tags/Golang/">
                         <span class="tag">Golang</span>
-                        <span class="tag is-grey">5</span>
+                        <span class="tag is-grey">6</span>
                     </a>
                 </div>
                 
