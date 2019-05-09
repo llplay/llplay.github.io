@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+<title>深入理解kafka学习笔记 - duoduo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+    
+    <meta name="description" content="kafka起初由LinkedIn公司采用Scala语言开发的一个多分区、多副本基于zookeeper协调的分布式消息系统，它以高吞吐、可持久化、可水平扩展、支持流数据处理等多种特性而被广泛应用。本文通过生产者、消费者、主题分区、日志存储等几个方面最kafka的基本用法和原理进行阐述，旨在以后方面回顾。文中大部分内容提取自《深入理解Kakfa 核心设计与实践原理》。 1. 初识kafka1.1 基本">
+<meta name="keywords" content="kafka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解kafka学习笔记">
+<meta property="og:url" content="http://llplay.github.io/2019/05/05/kafka/index.html">
+<meta property="og:site_name" content="duoduo">
+<meta property="og:description" content="kafka起初由LinkedIn公司采用Scala语言开发的一个多分区、多副本基于zookeeper协调的分布式消息系统，它以高吞吐、可持久化、可水平扩展、支持流数据处理等多种特性而被广泛应用。本文通过生产者、消费者、主题分区、日志存储等几个方面最kafka的基本用法和原理进行阐述，旨在以后方面回顾。文中大部分内容提取自《深入理解Kakfa 核心设计与实践原理》。 1. 初识kafka1.1 基本">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="http://llplay.github.io/css/images/kafka_title.jpg">
+<meta property="og:updated_time" content="2019-05-09T06:27:07.872Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入理解kafka学习笔记">
+<meta name="twitter:description" content="kafka起初由LinkedIn公司采用Scala语言开发的一个多分区、多副本基于zookeeper协调的分布式消息系统，它以高吞吐、可持久化、可水平扩展、支持流数据处理等多种特性而被广泛应用。本文通过生产者、消费者、主题分区、日志存储等几个方面最kafka的基本用法和原理进行阐述，旨在以后方面回顾。文中大部分内容提取自《深入理解Kakfa 核心设计与实践原理》。 1. 初识kafka1.1 基本">
+<meta name="twitter:image" content="http://llplay.github.io/css/images/kafka_title.jpg">
+
+
+
+
+
+
+
+<link rel="icon" href="/images/favicon.svg">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css">
+
+
+    
+    
+    
+    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+    
+
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+    
+
+    
+    
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+
+    
+    
+    
+    
+
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+    
+    
+    
+
+    
+    
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-3-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                <img src="/images/logo.svg" alt="深入理解kafka学习笔记" height="28">
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item" href="/">Home</a>
+                
+                <a class="navbar-item" href="/archives">Archives</a>
+                
+                <a class="navbar-item" href="/categories">Categories</a>
+                
+                <a class="navbar-item" href="/tags">Tags</a>
+                
+                <a class="navbar-item" href="/about">About</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                    
+                    
+                    <a class="navbar-item" target="_blank" title="Download on GitHub" href="http://github.com/ppoffice/hexo-theme-icarus">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                    
+                
+                
+                
+                <a class="navbar-item search" title="Search" href="javascript:;">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8-tablet is-8-desktop is-6-widescreen has-order-2 column-main"><div class="card">
+    
+    <div class="card-image">
+        <span class="image is-7by1">
+            <img class="thumbnail" src="/css/images/kafka_title.jpg" alt="深入理解kafka学习笔记">
+        </span>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2019-05-05T08:49:15.000Z">2019-05-05</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/kafka/">kafka</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    18 minutes read (About 2755 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                深入理解kafka学习笔记
+            
+        </h1>
+        <div class="content">
+            <p>kafka起初由LinkedIn公司采用Scala语言开发的一个多分区、多副本基于zookeeper协调的分布式消息系统，它以高吞吐、可持久化、可水平扩展、支持流数据处理等多种特性而被广泛应用。<br>本文通过生产者、消费者、主题分区、日志存储等几个方面最kafka的基本用法和原理进行阐述，旨在以后方面回顾。文中大部分内容提取自《深入理解Kakfa 核心设计与实践原理》。</p>
+<h2 id="1-初识kafka"><a href="#1-初识kafka" class="headerlink" title="1. 初识kafka"></a>1. 初识kafka</h2><h3 id="1-1-基本概念"><a href="#1-1-基本概念" class="headerlink" title="1.1 基本概念"></a>1.1 基本概念</h3><p><img src="/2019/05/05/kafka/kafka_struct.png" alt="kakfa体系结构"></p>
+<ul>
+<li>生产者</li>
+<li>消费者</li>
+<li><p>Broker，可以简单看做是一个独立的kafka服务节点或者服务实例。</p>
+</li>
+<li><p>主题，kafka中的消息以主题为单位进行归类，生产者负责将消息发送到特定的主题，消费者订阅主题并进行消费</p>
+</li>
+<li>分区，一个分区只属于单个主题，每个主题可以包含多个分区，分区可以分布在不同的broker上，同一主题下不同分区包含的消息是不同的</li>
+</ul>
+<p><img src="/2019/05/05/kafka/kafka_msg.png" alt="kakfa消息追加写入"></p>
+<p>分区在存储层面可以看做是一个可追加的日志本间。每条消息被发送到broker之前，会根据分区规则选择存储到哪个具体的分区。分区规则如果设置的合理，那么消息会被均匀的分配到不同的分区中。</p>
+<p>kafka为分区引入了多副本(Replica)机制，通过增加副本的数量可以提升容灾能力。副本之间是一主多从的关系，leader副本负责处理读写请求，follower副本负责和leader副本消息同步。副本处于不同的broker中，<br>当leader副本出现故障时，从follower副本中重新选举新的leader副本对外提供服务。kafka通过多副本机制实现了故障的自动转移，当kafka集群中某个broker失效时仍能保证服务可用。</p>
+<p><img src="/2019/05/05/kafka/kafka_multi_partition.jpg" alt="kakfa多副本架构"></p>
+<p>分区中所有的副本统称AR(Assigned Replicas), 所有与leader副本保持一定程度同步的副本(包括leader副本在内)组成ISR(In-Sync Replicas)。消息会先发送到leader副本，然后follower副本从leader副本中拉取消息进行同步。</p>
+<p><img src="/2019/05/05/kafka/kafka_hw_leo.png" alt="kakfa HW LEO"></p>
+<ul>
+<li>LEO: 高水位，副本最大位移</li>
+<li>HW: 低水位，ISR列表中最小的LEO，是消费者可消费的最大位移</li>
+</ul>
+<h2 id="2-生产者"><a href="#2-生产者" class="headerlink" title="2. 生产者"></a>2. 生产者</h2><p>最基本的生产者代码</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Properties props = <span class="hljs-keyword">new</span> Properties();</span><br><span class="line">props.put(<span class="hljs-string">"bootstrap.servers"</span>, <span class="hljs-string">"localhost:9092"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"acks"</span>, <span class="hljs-string">"all"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"key.serializer"</span>, <span class="hljs-string">"org.apache.kafka.common.serialization.StringSerializer"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"value.serializer"</span>, <span class="hljs-string">"org.apache.kafka.common.serialization.StringSerializer"</span>);</span><br><span class="line"></span><br><span class="line">Producer&lt;String, String&gt; producer = <span class="hljs-keyword">new</span> KafkaProducer&lt;&gt;(props);</span><br><span class="line"><span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">100</span>; i++)</span><br><span class="line">	producer.send(<span class="hljs-keyword">new</span> ProducerRecord&lt;String, String&gt;(<span class="hljs-string">"my-topic"</span>, Integer.toString(i), Integer.toString(i)));</span><br><span class="line"></span><br><span class="line">producer.close();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>bootstrap.servers: 设置集群broker地址清单，具体格式：host1:port1, host2:port2 可以设置一个或者多个，不需要设置所有的broker地址，生产者可以从给定的broker里面查到其他的broker信息，不过建议最少设置两个以上，其中一个宕机时，生产者还可以连到集群上</li>
+<li>key.serializer、value.serializer用来序列化ProducerRecord<string, string></string,></li>
+<li>asks: 这个参数用来指定分区中必须要有多少副本收到这条消息，之后生产者才会认为这条消息是成功写入的, asks的设置会影响吞吐量<ul>
+<li>asks == 1. 即只要leader副本成功写入消息，那么生产端就会收到服务端的成功响应</li>
+<li>asks == 0. 生产者不需要等待任何服务服务端的响应</li>
+<li>asks == -1 or asks == all. 需要等待ISR列表中的所有副本都成功写入，服务器端才能响应成功</li>
+</ul>
+</li>
+</ul>
+<p>发送数据三种模式，发后即忘，同步和异步</p>
+<p>同步：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">try</span>&#123;</span><br><span class="line">	Future&lt;RecordMetadata&gt; future = producer.send(record);</span><br><span class="line">	RecordMetadata metadata = future.get()</span><br><span class="line">&#125; <span class="hljs-keyword">catch</span>(...) &#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>异步<br><figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">producer.send(record, <span class="hljs-keyword">new</span> Callback()&#123;</span><br><span class="line">	<span class="hljs-meta">@Override</span></span><br><span class="line">	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onCompletion</span><span class="hljs-params">(RecordMetadata metadata, Exception exception)</span></span>&#123;</span><br><span class="line">		...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p><img src="/2019/05/05/kafka/kafka_producer.png" alt="kakfa 生产端的整体架构"></p>
+<p>消息缓存到batch，分批次发送，减少网络传输的资源消耗<br>send时，生产者并不会立即发送记录到broker，会先对记录做缓存。从图中可以看出，send会先发消息放到一个batch中，当一个batch满了之后，再申请一个新的batch填充，<br>kafka消费端维护了一个batch池，以便batch可以循环利用。此外消费者客户端会有一个send线程，实时去队列中获取已经满了的batch，发送到broker</p>
+<h2 id="3-消费者"><a href="#3-消费者" class="headerlink" title="3. 消费者"></a>3. 消费者</h2><p>kafka中的消费是基于拉取的,消费者会重复的调用poll方法拉取数据</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Properties props = <span class="hljs-keyword">new</span> Properties();</span><br><span class="line">props.put(<span class="hljs-string">"bootstrap.servers"</span>, <span class="hljs-string">"localhost:9092"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"group.id"</span>, <span class="hljs-string">"test"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"enable.auto.commit"</span>, <span class="hljs-string">"true"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"auto.commit.interval.ms"</span>, <span class="hljs-string">"1000"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"key.deserializer"</span>, <span class="hljs-string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"value.deserializer"</span>, <span class="hljs-string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);</span><br><span class="line">KafkaConsumer&lt;String, String&gt; consumer = <span class="hljs-keyword">new</span> KafkaConsumer&lt;&gt;(props);</span><br><span class="line">consumer.subscribe(Arrays.asList(<span class="hljs-string">"foo"</span>, <span class="hljs-string">"bar"</span>));</span><br><span class="line"><span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;</span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="hljs-number">100</span>);</span><br><span class="line">    <span class="hljs-keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : records)</span><br><span class="line">        System.out.printf(<span class="hljs-string">"offset = %d, key = %s, value = %s%n"</span>, record.offset(), record.key(), record.value());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>group.id: 消费者隶属的消费组名称, 消费组可以包含多个消费者，每个分片只能被一个消费组中的一个消费者消费</li>
+</ul>
+<p><img src="/2019/05/05/kafka/kafka_consumer_group.png" alt="kakfa consumer group"></p>
+<ul>
+<li>enable.auto.commit: 消费者消费完数据，需要告诉服务端消费的offset，以便下次poll数据时，服务端知道从哪里开始下发数据, 这个字段告诉消费者自动提交offset，<br>消费者后台线程会定期自动提交offset，周期可以通过auto.commit.interval.ms设置，默认5s</li>
+</ul>
+<p><img src="/2019/05/05/kafka/kafka_offset.jpeg" alt="kakfa consumer offset"></p>
+<p>但是自动提交会产生漏数据或者重复消费的问题。加入消费者一次poll到10条数据，在消费到第五条的时候，后台线程提交了offset，提交后消费者线程挂掉，<br>此时服务端会认为消费者已经将这10条数据消费，消费者重启，再poll数据时，会直接拉取10条后的数据。<br>不过因为kafka数据存储实在磁盘上的，会周期性的持久化，如果知道漏数据的offset，可以通过offset重新拉取数据<br>如果消费者在消费完数据后，提交位移前挂掉，会发生重复消费的问题。如果消费者业务是幂等的，重复消费不会产生太多问题，否则不太乐观<br>kafka同时提供了手动提交位移的api<br><figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">//一次poll消费完统一提交位移</span></span><br><span class="line">Properties props = <span class="hljs-keyword">new</span> Properties();</span><br><span class="line">props.put(<span class="hljs-string">"bootstrap.servers"</span>, <span class="hljs-string">"localhost:9092"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"group.id"</span>, <span class="hljs-string">"test"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"enable.auto.commit"</span>, <span class="hljs-string">"false"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"key.deserializer"</span>, <span class="hljs-string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);</span><br><span class="line">props.put(<span class="hljs-string">"value.deserializer"</span>, <span class="hljs-string">"org.apache.kafka.common.serialization.StringDeserializer"</span>);</span><br><span class="line">KafkaConsumer&lt;String, String&gt; consumer = <span class="hljs-keyword">new</span> KafkaConsumer&lt;&gt;(props);</span><br><span class="line">consumer.subscribe(Arrays.asList(<span class="hljs-string">"foo"</span>, <span class="hljs-string">"bar"</span>));</span><br><span class="line"><span class="hljs-keyword">while</span> (<span class="hljs-keyword">true</span>) &#123;</span><br><span class="line">    ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="hljs-number">100</span>);</span><br><span class="line">    insertIntoDb(records);</span><br><span class="line">    consumer.commitSync();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-comment">//每条记录消费完就提交</span></span><br><span class="line"><span class="hljs-keyword">try</span> &#123;</span><br><span class="line">    <span class="hljs-keyword">while</span>(running) &#123;</span><br><span class="line">        ConsumerRecords&lt;String, String&gt; records = consumer.poll(Long.MAX_VALUE);</span><br><span class="line">        <span class="hljs-keyword">for</span> (TopicPartition partition : records.partitions()) &#123;</span><br><span class="line">            List&lt;ConsumerRecord&lt;String, String&gt;&gt; partitionRecords = records.records(partition);</span><br><span class="line">            <span class="hljs-keyword">for</span> (ConsumerRecord&lt;String, String&gt; record : partitionRecords) &#123;</span><br><span class="line">                System.out.println(record.offset() + <span class="hljs-string">": "</span> + record.value());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="hljs-keyword">long</span> lastOffset = partitionRecords.get(partitionRecords.size() - <span class="hljs-number">1</span>).offset();</span><br><span class="line">            consumer.commitSync(Collections.singletonMap(partition, <span class="hljs-keyword">new</span> OffsetAndMetadata(lastOffset + <span class="hljs-number">1</span>)));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="hljs-keyword">finally</span> &#123;</span><br><span class="line">  consumer.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-主题分区"><a href="#4-主题分区" class="headerlink" title="4. 主题分区"></a>4. 主题分区</h2><h2 id="5-日志存储"><a href="#5-日志存储" class="headerlink" title="5. 日志存储"></a>5. 日志存储</h2><p>kafka以log日志的形式将数据存储到磁盘上，每个partition可以看做是一个整体的log文件，但为了不使单个log文件太大，kafka引入了日志分段(LogSegment)，将log日志切分成多个LogSegment，<br>相当于被平分为多个较小的文件</p>
+<p><img src="/2019/05/05/kafka/kafka_log_partition.png" alt="kakfa log partition logsegment"></p>
+<p><img src="/2019/05/05/kafka/kafka_log_struct.png" alt="kakfa 日志结构"></p>
+<p>index 中存储了索引以及物理偏移量。 log 存储了消息的内容。索引文件的元数据执行对应数据文件中message 的物理偏移地址。举个简单的案例来说，以<br>[4053,80899]为例，在 log 文件中，对应的是第 4053 条记录，物理偏移量（position）为 80899. position 是ByteBuffer 的指针位置</p>
+<p><img src="/2019/05/05/kafka/kafka_log_index.png" alt="kakfa 日志结构"></p>
+<p>查找算法</p>
+<ul>
+<li>根据offset的值，查找segment段中的index 索引文件。由于索引文件命名是以上一个文件的最后一个offset 进行命名的，所以，使用二分查找算法能够根据offset 快速定位到指定的索引文件。</li>
+<li>找到索引文件后，根据 offset 进行定位，找到索引文件中的符合范围的索引。(跳表)</li>
+<li>得到 position 以后，再到对应的 log 文件中，从 position出开始查找 offset 对应的消息，将每条消息的 offset 与目标 offset 进行比较，直到找到消息</li>
+</ul>
+<p>顺序写，页缓存和零拷贝</p>
+<ul>
+<li>顺序写: 磁盘的顺序写速度要远大于随机写，kafka在设计时采用了文件追加的方式写入消息，即只能在日志文件的尾部追加新的消息并且也不允许修改已经写入的消息，这种方式属于典型的顺序写盘的操作</li>
+<li>页缓存: <ul>
+<li>kafka采用mmap直接操作页缓存<a href="https://blog.csdn.net/thewayma/article/details/4287170" target="_blank" rel="noopener">pagecache</a>的方式，最终数据的读写基本都是操作内存，脏页数据由操作系统统一刷到磁盘，</li>
+<li>kafka提供了参数可以强制刷盘。页缓存存在的风险是，如果机器断电，页缓存中脏页数据没有刷到磁盘，会导致丢数据。但这个问题仅在机器断电时发生，多副本机制可以保障数据的可靠性。</li>
+<li>Linux会使用磁盘的一部分作为swap分区，这样可以进行进程的调度，把当前非活跃的进程调入swap分区，以此把内存空出来让给活跃的进程。但是对kafka来说，如果大量的页缓存被置换到swap区，会极大的降低kafka的性能，但是如果不设置swap分区，当内存不够用时，会导致OOM的发生。建议swap设置的小一些。</li>
+<li>使用页缓存使同时可以避免在JVM内部缓存数据，降低内存消耗</li>
+</ul>
+</li>
+<li>零拷贝: 在从磁盘读数据发送给消费者时，传统的做法被将数据从磁盘拷贝的内核空间，再由内核拷贝到用户空间，然后由用户控件拷贝到内核态的socket buffer中，最后内核态的buffer中拷贝到网卡，这中间需要四次复制过程，零拷贝技术将拷贝次数降低到两次</li>
+</ul>
+<p><img src="/2019/05/05/kafka/kafka_page_cache.jpg" alt="kakfa 传统拷贝"><br><img src="/2019/05/05/kafka/kafka_zero_copy.jpg" alt="kakfa 零拷贝"></p>
+
+        </div>
+        
+        <div class="level is-size-7 is-uppercase">
+            <div class="level-start">
+                <div class="level-item">
+                    <span class="is-size-6 has-text-grey has-mr-7">#</span>
+                    <a class="has-link-grey -link" href="/tags/kafka/">kafka</a>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+    </div>
+</div>
+
+
+
+
+
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        
+        <div class="level-end">
+            <a class="level level-item has-link-grey  article-nav-next" href="/2019/04/13/go_goroutine/">
+                <span class="level-item">并发 -《Go In Action》-Ch6</span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h3 class="title is-5 has-text-weight-normal">Comments</h3>
+        
+<script>
+    var disqus_config = function () {
+        this.page.url = 'http://llplay.github.io/2019/05/05/kafka/';
+        this.page.identifier = '2019/05/05/kafka/';
+    };
+    (function() {
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'yanglingduo' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+<div id="disqus_thread">
+    
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+    </div>
+</div>
+</div>
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen  has-order-1 column-left ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <nav class="level">
+            <div class="level-item has-text-centered">
+                <div>
+                    
+                        <img class="image is-128x128 has-mb-6" src="/css/images/helloworld.png" alt="Lingduo Yang">
+                    
+                    
+                    <p class="is-size-4 is-block">
+                        Lingduo Yang
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-block">
+                        R&amp;D
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-flex is-flex-center has-text-grey">
+                        <i class="fas fa-map-marker-alt has-mr-7"></i>
+                        <span>Beijing</span>
+                    </p>
+                    
+                </div>
+            </div>
+        </nav>
+        <nav class="level is-mobile">
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Posts
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        11
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Categories
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        4
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        Tags
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        8
+                    </p>
+                </div>
+            </div>
+        </nav>
+        <div class="level">
+            <a class="level-item button is-link is-rounded" href="http://github.com/ppoffice" target="_blank">
+                Follow</a>
+        </div>
+        
+        
+        <div class="level is-mobile">
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Github" href="http://github.com/ppoffice">
+                
+                <i class="fab fa-github"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Facebook" href="http://facebook.com">
+                
+                <i class="fab fa-facebook"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Twitter" href="http://twitter.com">
+                
+                <i class="fab fa-twitter"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="Dribbble" href="http://dribbble.com">
+                
+                <i class="fab fa-dribbble"></i>
+                
+            </a>
+            
+            <a class="level-item button is-white is-marginless" target="_blank" title="RSS" href="/">
+                
+                <i class="fas fa-rss"></i>
+                
+            </a>
+            
+        </div>
+        
+    </div>
+</div>
+    
+        
+    
+        
+
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Links
+        </h3>
+        <ul class="menu-list">
+        
+            <li>
+                <a class="level is-mobile" href="https://hexo.io" target="_blank">
+                    <span class="level-left">
+                        <span class="level-item">Hexo</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">hexo.io</span>
+                    </span>
+                </a>
+            </li>
+        
+            <li>
+                <a class="level is-mobile" href="https://github.com/ppoffice" target="_blank">
+                    <span class="level-left">
+                        <span class="level-item">PPOffice</span>
+                    </span>
+                    <span class="level-right">
+                        <span class="level-item tag">github.com</span>
+                    </span>
+                </a>
+            </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+
+
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Categories
+            </h3>
+            <ul class="menu-list">
+            <li>
+        <a class="level is-marginless" href="/categories/Go-In-Action/">
+            <span class="level-start">
+                <span class="level-item">Go In Action</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">6</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/Python/">
+            <span class="level-start">
+                <span class="level-item">Python</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">2</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/java/">
+            <span class="level-start">
+                <span class="level-item">java</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">2</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/kafka/">
+            <span class="level-start">
+                <span class="level-item">kafka</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">1</span>
+            </span>
+        </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Tag Cloud
+        </h3>
+        <a href="/tags/Golang/" style="font-size: 20px;">Golang</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/单例模式/" style="font-size: 10px;">单例模式</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/生产者消费者模型/" style="font-size: 10px;">生产者消费者模型</a> <a href="/tags/线程安全/" style="font-size: 10px;">线程安全</a> <a href="/tags/装饰器/" style="font-size: 10px;">装饰器</a> <a href="/tags/闭包/" style="font-size: 10px;">闭包</a>
+    </div>
+</div>
+
+    
+    
+        <div class="column-right-shadow is-hidden-widescreen ">
+        
+            
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Recent
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/05/05/kafka/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/kafka_title.jpg" alt="深入理解kafka学习笔记">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-05-05T08:49:15.000Z">2019-05-05</time></div>
+                    <a href="/2019/05/05/kafka/" class="has-link-black-ter is-size-6">深入理解kafka学习笔记</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/kafka/">kafka</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_goroutine/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="并发 -《Go In Action》-Ch6">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T10:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_goroutine/" class="has-link-black-ter is-size-6">并发 -《Go In Action》-Ch6</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_type/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="Go语言的类型系统 -《Go In Action》-Ch5">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T09:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_type/" class="has-link-black-ter is-size-6">Go语言的类型系统 -《Go In Action》-Ch5</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_set/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="数组、切片和映射-《Go In Action》-Ch4">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T02:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_set/" class="has-link-black-ter is-size-6">数组、切片和映射-《Go In Action》-Ch4</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/12/go_pack_tool/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time></div>
+                    <a href="/2019/04/12/go_pack_tool/" class="has-link-black-ter is-size-6">打包和工具链-《Go In Action》-Ch3</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Archives
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/05/">
+                <span class="level-start">
+                    <span class="level-item">May 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/04/">
+                <span class="level-start">
+                    <span class="level-item">April 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">6</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/03/">
+                <span class="level-start">
+                    <span class="level-item">March 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/12/">
+                <span class="level-start">
+                    <span class="level-item">December 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">3</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Tags
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Golang/">
+                        <span class="tag">Golang</span>
+                        <span class="tag is-grey">6</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/kafka/">
+                        <span class="tag">kafka</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/单例模式/">
+                        <span class="tag">单例模式</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/多线程/">
+                        <span class="tag">多线程</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/生产者消费者模型/">
+                        <span class="tag">生产者消费者模型</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/线程安全/">
+                        <span class="tag">线程安全</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/装饰器/">
+                        <span class="tag">装饰器</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/闭包/">
+                        <span class="tag">闭包</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+        
+        </div>
+    
+</div>
+
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only has-order-3 column-right ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            Recent
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/05/05/kafka/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/kafka_title.jpg" alt="深入理解kafka学习笔记">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-05-05T08:49:15.000Z">2019-05-05</time></div>
+                    <a href="/2019/05/05/kafka/" class="has-link-black-ter is-size-6">深入理解kafka学习笔记</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/kafka/">kafka</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_goroutine/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="并发 -《Go In Action》-Ch6">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T10:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_goroutine/" class="has-link-black-ter is-size-6">并发 -《Go In Action》-Ch6</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_type/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="Go语言的类型系统 -《Go In Action》-Ch5">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T09:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_type/" class="has-link-black-ter is-size-6">Go语言的类型系统 -《Go In Action》-Ch5</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/13/go_set/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="数组、切片和映射-《Go In Action》-Ch4">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-13T02:49:15.000Z">2019-04-13</time></div>
+                    <a href="/2019/04/13/go_set/" class="has-link-black-ter is-size-6">数组、切片和映射-《Go In Action》-Ch4</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2019/04/12/go_pack_tool/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time></div>
+                    <a href="/2019/04/12/go_pack_tool/" class="has-link-black-ter is-size-6">打包和工具链-《Go In Action》-Ch3</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            Archives
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/05/">
+                <span class="level-start">
+                    <span class="level-item">May 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/04/">
+                <span class="level-start">
+                    <span class="level-item">April 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">6</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/03/">
+                <span class="level-start">
+                    <span class="level-item">March 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/12/">
+                <span class="level-start">
+                    <span class="level-item">December 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">3</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                Tags
+            </h3>
+            <div class="field is-grouped is-grouped-multiline">
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/Golang/">
+                        <span class="tag">Golang</span>
+                        <span class="tag is-grey">6</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/kafka/">
+                        <span class="tag">kafka</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/单例模式/">
+                        <span class="tag">单例模式</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/多线程/">
+                        <span class="tag">多线程</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/生产者消费者模型/">
+                        <span class="tag">生产者消费者模型</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/线程安全/">
+                        <span class="tag">线程安全</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/装饰器/">
+                        <span class="tag">装饰器</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/闭包/">
+                        <span class="tag">闭包</span>
+                        <span class="tag is-grey">1</span>
+                    </a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+    
+    
+</div>
+
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <a class="footer-logo is-block has-mb-6" href="/">
+                
+                    <img src="/images/logo.svg" alt="深入理解kafka学习笔记" height="28">
+                
+                </a>
+                <p class="is-size-7">
+                &copy; 2019 lingduo.yang&nbsp;
+                Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a href="http://github.com/ppoffice/hexo-theme-icarus" target="_blank">Icarus</a>
+                
+                </p>
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Creative Commons" href="https://creativecommons.org/">
+                        
+                        <i class="fab fa-creative-commons"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/">
+                        
+                        <i class="fab fa-creative-commons-by"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Download on GitHub" href="http://github.com/ppoffice/hexo-theme-icarus">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("en");</script>
+
+
+    
+    
+    
+    <script src="/js/animation.js"></script>
+    
+
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+    <script src="/js/gallery.js" defer></script>
+    
+
+    
+    
+
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+
+    
+    
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    MathJax.Hub.Config({
+        'HTML-CSS': {
+            matchFontHeight: false
+        },
+        SVG: {
+            matchFontHeight: false
+        },
+        CommonHTML: {
+            matchFontHeight: false
+        },
+        tex2jax: {
+            inlineMath: [
+                ['$','$'],
+                ['\\(','\\)']
+            ]
+        }
+    });
+});
+</script>
+
+    
+    
+
+<a id="back-to-top" title="Back to Top" href="javascript:;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+    <script src="/js/clipboard.js" defer></script>
+    
+
+    
+    
+    
+
+
+<script src="/js/main.js" defer></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="Type something...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: 'Posts',
+                PAGES: 'Pages',
+                CATEGORIES: 'Categories',
+                TAGS: 'Tags',
+                UNTITLED: '(Untitled)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+</body>
+</html>
