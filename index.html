@@ -156,7 +156,7 @@
                 <span class="level-item has-text-grey">
                     
                     
-                    18 minutes read (About 2755 words)
+                    19 minutes read (About 2823 words)
                 </span>
                 
                 
@@ -241,7 +241,12 @@
 <li>使用页缓存使同时可以避免在JVM内部缓存数据，降低内存消耗</li>
 </ul>
 </li>
-<li>零拷贝: 在从磁盘读数据发送给消费者时，传统的做法被将数据从磁盘拷贝的内核空间，再由内核拷贝到用户空间，然后由用户控件拷贝到内核态的socket buffer中，最后内核态的buffer中拷贝到网卡，这中间需要四次复制过程，零拷贝技术将拷贝次数降低到两次</li>
+<li>零拷贝: 在从磁盘读数据发送给消费者时，传统的做法被将数据从磁盘拷贝的内核空间，再由内核拷贝到用户空间，然后由用户控件拷贝到内核态的socket buffer中，最后内核态的buffer中拷贝到网卡，这中间需要四次复制过程，零拷贝技术将拷贝次数降低到两次,<ul>
+<li>将文件拷贝到kernel buffer中；</li>
+<li>向socket buffer中追加当前要发生的数据在kernel buffer中的位置和偏移量；</li>
+<li>根据socket buffer中的位置和偏移量直接将kernel buffer的数据copy到网卡设备（protocol engine）中；</li>
+</ul>
+</li>
 </ul>
 <p><img src="/2019/05/05/kafka/kafka_page_cache.jpg" alt="kakfa 传统拷贝"><br><img src="/2019/05/05/kafka/kafka_zero_copy.jpg" alt="kakfa 零拷贝"></p>
 
