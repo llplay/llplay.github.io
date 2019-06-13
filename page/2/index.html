@@ -137,6 +137,82 @@
     <div class="card">
     
     <div class="card-image">
+        <a href="/2017/12/05/safe-singleton/" class="image is-7by1">
+            <img class="thumbnail" src="/css/images/thread-safe-singleton.jpg" alt="一个线程安全的单例模式">
+        </a>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2017-12-05T02:30:21.000Z">2017-12-05</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/java/">java</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    9 minutes read (About 1377 words)
+                </span>
+                
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                <a class="has-link-black-ter" href="/2017/12/05/safe-singleton/">一个线程安全的单例模式</a>
+            
+        </h1>
+        <div class="content">
+            <p>单例模式的一般构造方法</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SingletonConsumer</span> </span>&#123;</span><br><span class="line">    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> Logger logger = Logger.getLogger(SingletonConsumer.class);</span><br><span class="line">    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> SingletonConsumer instance;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">SingletonConsumer</span><span class="hljs-params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="hljs-function"><span class="hljs-keyword">public</span> SingletonConsumer <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;</span><br><span class="line">        <span class="hljs-keyword">if</span> (instance == <span class="hljs-keyword">null</span>) &#123;</span><br><span class="line">            logger.debug(<span class="hljs-string">"instance is null, trying to instantiate a new one"</span>);</span><br><span class="line">            instance = <span class="hljs-keyword">new</span> SingletonConsumer();</span><br><span class="line">        &#125; <span class="hljs-keyword">else</span> &#123;</span><br><span class="line">            logger.debug(<span class="hljs-string">"instance is not null, return the already-instantiated one"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上这种构造方法在单线程下运行是安全的，但是如果放到多线程下，则会出现各种各样的问题，为此我们设计一个实验来验证多线程下，以上方法会出现什么问题。</p>
+<h1 id="Experiment"><a href="#Experiment" class="headerlink" title="Experiment"></a>Experiment</h1><p>实验中我们设置10个线程去创建SingletonConsumer实例，最后验证到底创建了多少个实例。</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-meta">@Test</span></span><br><span class="line">  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">singletonConsumerTest</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">       ExecutorService executors = Executors.newFixedThreadPool(<span class="hljs-number">10</span>);</span><br><span class="line">       Set&lt;SingletonConsumer&gt; set = <span class="hljs-keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">       <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++)&#123;</span><br><span class="line">           executors.execute(</span><br><span class="line">                   () -&gt; set.add(SingletonConsumer.getInstance())</span><br><span class="line">           );</span><br><span class="line">       &#125;</span><br><span class="line">       executors.shutdown();</span><br><span class="line">       executors.awaitTermination(<span class="hljs-number">1</span>, TimeUnit.HOURS);</span><br><span class="line">       Assert.assertEquals(<span class="hljs-number">10</span>, set.size());</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>运行测试，输出结果如下</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 13:50:52 DEBUG SingletonConsumer:20 - instance is null, trying to instantiate a new one</span><br><span class="line">set size:10</span><br></pre></td></tr></table></figure>
+<p>会发现此时实际上构造了是个SingletonConsumer实例，那怎么才能构造线程安全的单例模式？<br>首先想到的方法是将getInstance的代码用synchronized包起来，这样就能够保证getInstance方法每次只能有一个线程访问到，于是代码就变成了<br>下面的样子</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> SingletonConsumer <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;</span><br><span class="line">       <span class="hljs-keyword">synchronized</span> (SingletonConsumer.class) &#123;</span><br><span class="line">           <span class="hljs-keyword">if</span> (instance == <span class="hljs-keyword">null</span>) &#123;</span><br><span class="line">               logger.debug(<span class="hljs-string">"instance is null, trying to instantiate a new one"</span>);</span><br><span class="line">               instance = <span class="hljs-keyword">new</span> SingletonConsumer();</span><br><span class="line">           &#125; <span class="hljs-keyword">else</span> &#123;</span><br><span class="line">               logger.debug(<span class="hljs-string">"instance is not null, return the already-instantiated one"</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="hljs-keyword">return</span> instance;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>我们再次运行测试脚本</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:21 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:24 - instance is not null, return the already-instantiated one</span><br><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:24 - instance is not null, return the already-instantiated one</span><br><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:24 - instance is not null, return the already-instantiated one</span><br><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:24 - instance is not null, return the already-instantiated one</span><br><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:24 - instance is not null, return the already-instantiated one</span><br><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:24 - instance is not null, return the already-instantiated one</span><br><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:24 - instance is not null, return the already-instantiated one</span><br><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:24 - instance is not null, return the already-instantiated one</span><br><span class="line">2017-02-26 14:01:12 DEBUG SingletonConsumer:24 - instance is not null, return the already-instantiated one</span><br><span class="line">java.lang.AssertionError: </span><br><span class="line">Expected :10</span><br><span class="line">Actual   :1</span><br><span class="line">  &lt;Click to see difference&gt;</span><br></pre></td></tr></table></figure>
+<p>此时发现，只初始化了一个SingletonConsumer实例，说明这种方法是work的。</p>
+<p>但是仔细去想一想，上面的方法是有效率问题的。假设有一个线程A正在synchronized块中判断instance是否为null，此时其他线程只能等待线程A判断完毕才可以再去判断。仔细想想，instance是否为空，其实是可以多个线程同时去判断的，因此我们将代码修改成一下形式：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-keyword">if</span> (instance == <span class="hljs-keyword">null</span>) &#123;</span><br><span class="line">            <span class="hljs-keyword">synchronized</span> (SingletonConsumer.class) &#123;</span><br><span class="line">                logger.debug(<span class="hljs-string">"instance is null, trying to instantiate a new one"</span>);</span><br><span class="line">                instance = <span class="hljs-keyword">new</span> SingletonConsumer();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="hljs-keyword">else</span> &#123;</span><br><span class="line">            logger.debug(<span class="hljs-string">"instance is not null, return the already-instantiated one"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="hljs-keyword">return</span> instance;</span><br></pre></td></tr></table></figure>
+<p>上面的代码中，我们将instance是否为空的判断移到了同步块的外面。那这种方法是否是线程安全的呢，再次运行测试脚本，观察结果：</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">2017-02-26 14:14:18 DEBUG SingletonConsumer:28 - instance is null, trying to instantiate a new one</span><br><span class="line">set size:10</span><br></pre></td></tr></table></figure>
+<p>通过结果发现，依然实例化了10个SingeltonCoumser。<br>考虑一种情况，初始install为空，线程A判断完instance是否为空，发现instance为null，刚好线程A的时间片用完，轮到线程B去判断instance是否为空，线程B发现instance也是null，此时时间片又回到了线程A的手中，线程A去创建SingletonConsumer对象，创建完成，线程B去创建对象，这样下去，就造成了上述实验的现象，因此，未解决上面的问题，需要带同步块中同样去判断instance是否为null。最后的代码如下：</p>
+<figure class="highlight java hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> SingletonConsumer <span class="hljs-title">getInstance</span><span class="hljs-params">()</span> </span>&#123;</span><br><span class="line">       <span class="hljs-keyword">if</span> (instance == <span class="hljs-keyword">null</span>) &#123;</span><br><span class="line">           <span class="hljs-keyword">synchronized</span> (SingletonConsumer.class) &#123;</span><br><span class="line">               <span class="hljs-keyword">if</span> (instance == <span class="hljs-keyword">null</span>) &#123;</span><br><span class="line">                   logger.debug(<span class="hljs-string">"instance is null, trying to instantiate a new one"</span>);</span><br><span class="line">                   instance = <span class="hljs-keyword">new</span> SingletonConsumer();</span><br><span class="line">               &#125;</span><br><span class="line">               <span class="hljs-keyword">else</span> &#123;</span><br><span class="line">                   logger.debug(<span class="hljs-string">"instance is not null, return the already-instantiated one "</span>);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125; <span class="hljs-keyword">else</span> &#123;</span><br><span class="line">           logger.debug(<span class="hljs-string">"instance is not null, return the already-instantiated one"</span>);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="hljs-keyword">return</span> instance;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>最有还有一点要注意，由于JVM会对代码进行优化，所以代码的执行顺序在真运行的时候会发生变化，会导致赋值操作编程不可见的，因此才进行赋值操作时，instance有可能只拿到一个为完全初始化的实例，这样会导致一些错误。</p>
+<p><code>instance = new SingletonConsumer();</code></p>
+<p>解决办法是将instance生命为volatile的，volatile关键词可以保证可见性和有序性，其具体内容待下次再表。</p>
+<h1 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h1><p>总之，一个线程安全的单例模式需要注意以下3点：</p>
+<p>1.getInstance的需要用synchronized关键词</p>
+<p>2.为提高效率，instance是否为空可提到同步块以外，但内层的判断依然要保留</p>
+<p>3.instance需要声明为volatile</p>
+<p>代码见：<a href="https://github.com/llplay/muti-thread-learn" target="_blank" rel="noopener">GitHub</a></p>
+
+        </div>
+        
+        
+        
+    </div>
+</div>
+
+
+
+
+
+
+
+
+    <div class="card">
+    
+    <div class="card-image">
         <a href="/2017/12/04/proandconsu/" class="image is-7by1">
             <img class="thumbnail" src="/css/images/consumer_producer.jpg" alt="生产者和消费者模型初探">
         </a>
@@ -297,7 +373,7 @@
                         Posts
                     </p>
                     <p class="title has-text-weight-normal">
-                        11
+                        12
                     </p>
                 </div>
             </div>
@@ -307,7 +383,7 @@
                         Categories
                     </p>
                     <p class="title has-text-weight-normal">
-                        4
+                        5
                     </p>
                 </div>
             </div>
@@ -317,7 +393,7 @@
                         Tags
                     </p>
                     <p class="title has-text-weight-normal">
-                        8
+                        9
                     </p>
                 </div>
             </div>
@@ -423,6 +499,14 @@
                 <span class="level-item tag">6</span>
             </span>
         </a></li><li>
+        <a class="level is-marginless" href="/categories/HMM/">
+            <span class="level-start">
+                <span class="level-item">HMM</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">1</span>
+            </span>
+        </a></li><li>
         <a class="level is-marginless" href="/categories/Python/">
             <span class="level-start">
                 <span class="level-item">Python</span>
@@ -458,7 +542,7 @@
         <h3 class="menu-label">
             Tag Cloud
         </h3>
-        <a href="/tags/Golang/" style="font-size: 20px;">Golang</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/单例模式/" style="font-size: 10px;">单例模式</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/生产者消费者模型/" style="font-size: 10px;">生产者消费者模型</a> <a href="/tags/线程安全/" style="font-size: 10px;">线程安全</a> <a href="/tags/装饰器/" style="font-size: 10px;">装饰器</a> <a href="/tags/闭包/" style="font-size: 10px;">闭包</a>
+        <a href="/tags/Golang/" style="font-size: 20px;">Golang</a> <a href="/tags/HMM/" style="font-size: 10px;">HMM</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/单例模式/" style="font-size: 10px;">单例模式</a> <a href="/tags/多线程/" style="font-size: 10px;">多线程</a> <a href="/tags/生产者消费者模型/" style="font-size: 10px;">生产者消费者模型</a> <a href="/tags/线程安全/" style="font-size: 10px;">线程安全</a> <a href="/tags/装饰器/" style="font-size: 10px;">装饰器</a> <a href="/tags/闭包/" style="font-size: 10px;">闭包</a>
     </div>
 </div>
 
@@ -472,6 +556,25 @@
         <h3 class="menu-label">
             Recent
         </h3>
+        
+        <article class="media">
+            
+            <a href="/2019/06/12/hmm_example/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="hmm example">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-06-12T08:49:15.000Z">2019-06-12</time></div>
+                    <a href="/2019/06/12/hmm_example/" class="has-link-black-ter is-size-6">hmm example</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/HMM/">HMM</a>
+                    </p>
+                </div>
+            </div>
+        </article>
         
         <article class="media">
             
@@ -549,25 +652,6 @@
             </div>
         </article>
         
-        <article class="media">
-            
-            <a href="/2019/04/12/go_pack_tool/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time></div>
-                    <a href="/2019/04/12/go_pack_tool/" class="has-link-black-ter is-size-6">打包和工具链-《Go In Action》-Ch3</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
     </div>
 </div>
 
@@ -579,6 +663,17 @@
             Archives
         </h3>
         <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/06/">
+                <span class="level-start">
+                    <span class="level-item">June 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
         
         <li>
             <a class="level is-marginless" href="/archives/2019/05/">
@@ -641,6 +736,13 @@
                     <a class="tags has-addons" href="/tags/Golang/">
                         <span class="tag">Golang</span>
                         <span class="tag is-grey">6</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/HMM/">
+                        <span class="tag">HMM</span>
+                        <span class="tag is-grey">1</span>
                     </a>
                 </div>
                 
@@ -718,6 +820,25 @@
         
         <article class="media">
             
+            <a href="/2019/06/12/hmm_example/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="/images/thumbnail.svg" alt="hmm example">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-06-12T08:49:15.000Z">2019-06-12</time></div>
+                    <a href="/2019/06/12/hmm_example/" class="has-link-black-ter is-size-6">hmm example</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/HMM/">HMM</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
             <a href="/2019/05/05/kafka/" class="media-left">
                 <p class="image is-64x64">
                     <img class="thumbnail" src="/css/images/kafka_title.jpg" alt="深入理解kafka学习笔记">
@@ -792,25 +913,6 @@
             </div>
         </article>
         
-        <article class="media">
-            
-            <a href="/2019/04/12/go_pack_tool/" class="media-left">
-                <p class="image is-64x64">
-                    <img class="thumbnail" src="/css/images/golang.png" alt="打包和工具链-《Go In Action》-Ch3">
-                </p>
-            </a>
-            
-            <div class="media-content">
-                <div class="content">
-                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2019-04-12T02:49:15.000Z">2019-04-12</time></div>
-                    <a href="/2019/04/12/go_pack_tool/" class="has-link-black-ter is-size-6">打包和工具链-《Go In Action》-Ch3</a>
-                    <p class="is-size-7 is-uppercase">
-                        <a class="has-link-grey -link" href="/categories/Go-In-Action/">Go In Action</a>
-                    </p>
-                </div>
-            </div>
-        </article>
-        
     </div>
 </div>
 
@@ -822,6 +924,17 @@
             Archives
         </h3>
         <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2019/06/">
+                <span class="level-start">
+                    <span class="level-item">June 2019</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
         
         <li>
             <a class="level is-marginless" href="/archives/2019/05/">
@@ -884,6 +997,13 @@
                     <a class="tags has-addons" href="/tags/Golang/">
                         <span class="tag">Golang</span>
                         <span class="tag is-grey">6</span>
+                    </a>
+                </div>
+                
+                <div class="control">
+                    <a class="tags has-addons" href="/tags/HMM/">
+                        <span class="tag">HMM</span>
+                        <span class="tag is-grey">1</span>
                     </a>
                 </div>
                 
